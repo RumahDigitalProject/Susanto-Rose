@@ -21,34 +21,34 @@
 
     body {
       background: url('pembuka.webp') no-repeat center center;
-      background-size: contain;
+      background-size: cover;
       animation: fadeIn 2.5s ease-in-out forwards;
     }
 
-.btn-buka {
-  position: absolute;
-  bottom: 120px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #ffffffcc; /* putih semi transparan */
-  color: #000;
-  padding: 10px 30px;
-  border-radius: 12px;
-  font-size: 17px;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  border: 1px solid #ddd;
-  transition: 0.3s ease;
-  animation: slideUp 1s ease-out 1.2s forwards, pulse 1.8s ease-in-out infinite 3s;
-  opacity: 0;
-}
+    .btn-buka {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #ffffffcc; /* putih semi transparan */
+      color: #000;
+      padding: 12px 36px;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border: 1px solid #ddd;
+      transition: 0.3s ease;
+      animation: slideUp 1s ease-out 1.2s forwards, pulse 1.8s ease-in-out infinite 3s;
+      opacity: 0;
+    }
 
-.btn-buka:hover {
-  background-color: #fff;
-  transform: translateX(-50%) scale(1.03);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-}
+    .btn-buka:hover {
+      background-color: #fff;
+      transform: translateX(-50%) scale(1.05);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
 
     /* ANIMASI */
     @keyframes fadeIn {
@@ -73,23 +73,58 @@
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
       }
       50% {
-        transform: translateX(-50%) scale(1.07);
-        box-shadow: 0 0 20px rgba(255, 255, 255, 1);
+        transform: translateX(-50%) scale(1.08);
+        box-shadow: 0 0 22px rgba(255, 255, 255, 1);
       }
     }
 
     @media (max-height: 700px) {
       .btn-buka {
-        bottom: 15px;
-        padding: 14px 28px;
+        bottom: 20px;
+        padding: 12px 28px;
         font-size: 16px;
       }
+    }
+
+    /* Halaman video */
+    #video-page {
+      display: none;
+      height: 100%;
+      width: 100%;
+      background: #000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #video-page video {
+      height: 100vh;
+      width: auto;
+      object-fit: cover;
     }
   </style>
 </head>
 <body>
 
-  <a href="undangan.html" class="btn-buka">Buka Undangan</a>
+  <!-- Halaman pembuka -->
+  <div id="home-page">
+    <a href="#" class="btn-buka" onclick="openVideo()">Buka Undangan</a>
+  </div>
+
+  <!-- Halaman video -->
+  <div id="video-page">
+    <video id="undanganVideo" autoplay muted playsinline>
+      <source src="assets/video/undangan.mp4" type="video/mp4">
+      Browser Anda tidak mendukung video.
+    </video>
+  </div>
+
+  <script>
+    function openVideo() {
+      document.getElementById('home-page').style.display = 'none';
+      document.getElementById('video-page').style.display = 'flex';
+      document.getElementById('undanganVideo').play();
+    }
+  </script>
 
 </body>
 </html>
