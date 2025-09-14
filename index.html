@@ -101,6 +101,36 @@
       width: auto;
       object-fit: cover;
     }
+
+    /* Halaman penutup */
+    #closing-page {
+      display: none;
+      height: 100vh;
+      width: 100%;
+      background: #fdfdfd;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+
+    #closing-page button {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      background: #000;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    #closing-page p {
+      font-size: 14px;
+      color: #444;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -113,21 +143,44 @@
   <!-- Halaman video -->
   <div id="video-page">
     <video id="undanganVideo" autoplay playsinline>
-      <source src="https://raw.githubusercontent.com/rumahdigitalproject/Susanto-Rose/main/video.mp4
-" type="video/mp4">
+      <source src="https://raw.githubusercontent.com/rumahdigitalproject/Susanto-Rose/main/video.mp4" type="video/mp4">
       Browser Anda tidak mendukung video.
     </video>
   </div>
 
-<script>
-  function openVideo() {
-    document.getElementById('home-page').style.display = 'none';
-    document.getElementById('video-page').style.display = 'flex';
-    let vid = document.getElementById('undanganVideo');
-    vid.muted = false; // hidupkan audio
-    vid.play();
-  }
-</script>
+  <!-- Halaman penutup -->
+  <div id="closing-page">
+    <button onclick="replayVideo()">↑</button>
+    <p>© 2025 Rumah Digital Project</p>
+  </div>
+
+  <script>
+    function openVideo() {
+      document.getElementById('home-page').style.display = 'none';
+      document.getElementById('video-page').style.display = 'flex';
+      document.getElementById('closing-page').style.display = 'none';
+
+      let vid = document.getElementById('undanganVideo');
+      vid.muted = false; // hidupkan audio
+      vid.play();
+
+      // kalau video selesai → tampilkan penutup
+      vid.onended = function() {
+        document.getElementById('video-page').style.display = 'none';
+        document.getElementById('closing-page').style.display = 'flex';
+        document.getElementById('closing-page').scrollIntoView({ behavior: 'smooth' });
+      };
+    }
+
+    function replayVideo() {
+      document.getElementById('closing-page').style.display = 'none';
+      document.getElementById('video-page').style.display = 'flex';
+
+      let vid = document.getElementById('undanganVideo');
+      vid.currentTime = 0; // mulai dari awal
+      vid.play();
+    }
+  </script>
 
 </body>
 </html>
