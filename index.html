@@ -100,7 +100,7 @@
         .btn-download:hover { background-color: #218838; }
         .info-text { font-size: 0.8rem; color: #666; margin-top: 15px; text-align: justify; }
 
-        /* --- Master Kertas A4 --- */
+        /* --- Master Kertas A4 (Tampilan Web) --- */
         .a4-paper {
             width: 210mm;
             min-height: 297mm;
@@ -110,9 +110,9 @@
             position: relative;
         }
 
-        /* --- HALAMAN 1: CSS SURAT LAMARAN (Dengan Margin) --- */
+        /* --- HALAMAN 1: CSS SURAT LAMARAN --- */
         .page-surat {
-            padding: 20mm 25mm; /* Margin khusus teks */
+            padding: 20mm 25mm; /* Margin teks */
             font-family: 'Arial', Helvetica, sans-serif;
             font-size: 11pt;
             line-height: 1.4;
@@ -133,19 +133,19 @@
         .page-surat .nama-ttd { font-weight: bold; margin-top: 60px; }
         .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px;}
 
-        /* --- HALAMAN 2+: CSS LAMPIRAN GAMBAR (Tanpa Margin / Full Page) --- */
+        /* --- HALAMAN 2+: CSS LAMPIRAN GAMBAR --- */
         .page-image {
             padding: 0 !important; /* Hilangkan margin agar full */
-            display: none; /* Disembunyikan default, diatur oleh JS */
+            display: none; /* Diatur oleh Javascript */
         }
         .page-image img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Memastikan gambar A4 proporsional penuh */
+            object-fit: contain; 
             display: block;
         }
 
-        /* --- Responsive HP --- */
+        /* --- Responsive HP (Agar Preview di HP pas di layar) --- */
         @media (max-width: 768px) {
             .container { flex-direction: column; }
             .form-panel { width: 100%; border-bottom: 1px solid #ccc; }
@@ -156,27 +156,55 @@
             }
         }
 
-        /* --- CSS KHUSUS PRINT PDF --- */
+        /* =======================================================
+           PERBAIKAN CSS KHUSUS PRINT PDF UNTUK HP ANDROID 
+           ======================================================= */
         @media print {
-            @page { size: A4 portrait; margin: 0; }
-            body { background-color: white; -webkit-print-color-adjust: exact; }
+            @page { 
+                size: A4 portrait; 
+                margin: 0; 
+            }
+            body, html { 
+                background-color: white; 
+                -webkit-print-color-adjust: exact; 
+                margin: 0; 
+                padding: 0;
+            }
             .navbar, .form-panel { display: none !important; }
-            .container { display: block; }
-            .preview-panel { padding: 0; background-color: white; display: block; gap: 0; }
+            .container { display: block; margin: 0; padding: 0; }
+            .preview-panel { padding: 0; display: block; gap: 0; background: none; }
             
+            /* Kertas A4 dipaksa ke skala asli dan ukuran pas A4 */
             .a4-paper {
                 box-shadow: none !important;
                 margin: 0 !important;
-                width: 210mm !important;
-                height: 297mm !important;
-                transform: none !important;
-                page-break-after: always;
+                width: 100% !important; /* Gunakan persentase agar tidak bentrok dengan viewport HP */
+                height: 297mm !important; /* Tinggi dipaksa mutlak 1 lembar A4 */
+                max-height: 297mm !important;
+                
+                /* Ini kunci untuk memperbaiki TEKS KECIL di HP */
+                transform: scale(1) !important; 
+                transform-origin: top left !important;
+                
+                page-break-after: always !important; /* Selalu turun ke halaman baru */
+                page-break-inside: avoid !important;
+                overflow: hidden !important; /* Cegah meluber (terpotong) */
             }
-            .a4-paper:last-child { page-break-after: auto; }
             
-            /* Pertahankan margin di surat lamaran, hilangkan di gambar */
-            .page-surat { padding: 20mm 25mm !important; }
-            .page-image { padding: 0 !important; }
+            /* Halaman terakhir tidak usah pakai pemisah, agar tidak ada blank page */
+            .a4-paper:last-of-type { page-break-after: auto !important; }
+            
+            .page-surat { padding: 20mm 25mm !important; box-sizing: border-box !important; }
+            .page-image { padding: 0 !important; box-sizing: border-box !important; }
+            
+            /* Ini kunci untuk memperbaiki GAMBAR TERPOTONG di HP */
+            .page-image img {
+                width: 100% !important;
+                height: 100% !important; /* Mengikuti batas height: 297mm milik .a4-paper */
+                object-fit: contain !important; /* Memaksa gambar pas (fit) di dalam A4 tanpa merusak proporsi */
+                display: block !important;
+                margin: 0 auto !important;
+            }
             
             .highlight { background-color: transparent !important; padding: 0; }
         }
@@ -271,7 +299,7 @@
                 </div>
             </div>
 
-            <!-- HALAMAN 2: PILIHAN CV (Otomatis Full Page) -->
+            <!-- HALAMAN 2: PILIHAN CV -->
             <div class="a4-paper page-image" id="hal-cv-ats">
                 <img src="ats.png" alt="CV ATS">
             </div>
@@ -280,7 +308,7 @@
                 <img src="biasa.png" alt="CV Biasa">
             </div>
 
-            <!-- HALAMAN 3-6: LAMPIRAN OTOMATIS (Full Page) -->
+            <!-- HALAMAN 3-6: LAMPIRAN OTOMATIS -->
             <div class="a4-paper page-image lampiran-doc">
                 <img src="ijazah.png" alt="Ijazah">
             </div>
@@ -308,7 +336,7 @@
         };
 
         function updatePreview() {
-            // 1. Update Teks Surat Lamaran
+            // Update Teks Surat Lamaran
             let kota = document.getElementById('inputKota').value;
             let pt = document.getElementById('inputPT').value;
             
@@ -324,12 +352,12 @@
             prevPT.style.backgroundColor = pt ? "transparent" : "#ffffcc";
             prevPT2.style.backgroundColor = pt ? "transparent" : "#ffffcc";
 
-            // 2. Logika Pilihan CV (Tampilkan yang dipilih saja)
+            // Logika Pilihan CV 
             let pilihanCV = document.querySelector('input[name="cvType"]:checked').value;
             document.getElementById('hal-cv-ats').style.display = (pilihanCV === 'ats') ? 'block' : 'none';
             document.getElementById('hal-cv-biasa').style.display = (pilihanCV === 'biasa') ? 'block' : 'none';
 
-            // 3. Selalu tampilkan lampiran (Ijazah, KTP, dll) di bawah CV
+            // Menampilkan Ijazah, KTP, dll.
             let lampiran = document.querySelectorAll('.lampiran-doc');
             lampiran.forEach(doc => {
                 doc.style.display = 'block';
