@@ -48,7 +48,7 @@
             flex-direction: column;
             align-items: center;
             background-color: #525659;
-            gap: 20px; /* Jarak antar halaman A4 di layar preview */
+            gap: 20px;
         }
         
         /* --- Form Styles --- */
@@ -100,7 +100,7 @@
         .btn-download:hover { background-color: #218838; }
         .info-text { font-size: 0.8rem; color: #666; margin-top: 15px; text-align: justify; }
 
-        /* --- Kertas A4 Master --- */
+        /* --- Master Kertas A4 --- */
         .a4-paper {
             width: 210mm;
             min-height: 297mm;
@@ -110,9 +110,9 @@
             position: relative;
         }
 
-        /* --- HALAMAN 1: CSS SURAT LAMARAN (KTP) --- */
+        /* --- HALAMAN 1: CSS SURAT LAMARAN (Dengan Margin) --- */
         .page-surat {
-            padding: 20mm 25mm;
+            padding: 20mm 25mm; /* Margin khusus teks */
             font-family: 'Arial', Helvetica, sans-serif;
             font-size: 11pt;
             line-height: 1.4;
@@ -131,48 +131,19 @@
         .page-surat li { margin-bottom: 2px; }
         .page-surat .ttd { margin-top: 25px; }
         .page-surat .nama-ttd { font-weight: bold; margin-top: 60px; }
+        .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px;}
 
-        /* --- HALAMAN 2: CSS CV ATS (V3) --- */
-        .page-cv-ats {
-            padding: 20mm 25mm;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 11pt;
-            line-height: 1.5;
-            color: #2b2b2b;
-            display: none; /* Disembunyikan default */
+        /* --- HALAMAN 2+: CSS LAMPIRAN GAMBAR (Tanpa Margin / Full Page) --- */
+        .page-image {
+            padding: 0 !important; /* Hilangkan margin agar full */
+            display: none; /* Disembunyikan default, diatur oleh JS */
         }
-        .page-cv-ats h1.nama {
-            font-size: 22pt; text-align: center; text-transform: uppercase; margin: 0 0 5px 0; color: var(--primary); letter-spacing: 1.5px;
-        }
-        .page-cv-ats .kontak {
-            text-align: center; font-size: 10pt; margin-bottom: 22px; color: #555555;
-        }
-        .page-cv-ats .kontak span { color: var(--primary); margin: 0 5px; }
-        .page-cv-ats h2.judul-section {
-            font-size: 12.5pt; color: var(--primary); border-bottom: 1.5px solid var(--primary); padding-bottom: 4px; margin-top: 22px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .page-cv-ats p.ringkasan { text-align: justify; margin-top: 0; font-size: 10.5pt; }
-        .page-cv-ats .job-header { width: 100%; margin-bottom: 2px; position: relative; }
-        .page-cv-ats .job-title { font-weight: bold; font-size: 11pt; color: #000; }
-        .page-cv-ats .job-company { font-size: 11pt; color: #444; }
-        .page-cv-ats .job-date { position: absolute; right: 0; top: 0; font-weight: bold; color: var(--primary); font-size: 10pt; }
-        .page-cv-ats ul.list-pengalaman { margin-top: 4px; margin-bottom: 15px; padding-left: 18px; }
-        .page-cv-ats ul.list-pengalaman li { margin-bottom: 4px; text-align: justify; font-size: 10.5pt; }
-        .page-cv-ats .skill-group { margin-bottom: 6px; font-size: 10.5pt; }
-        .page-cv-ats .skill-cat { font-weight: bold; color: var(--primary); }
-
-        /* --- HALAMAN 2: CSS CV BIASA (GAMBAR) --- */
-        .page-cv-biasa {
-            padding: 0; /* Tanpa margin agar gambar bisa full A4 */
-            display: none; /* Disembunyikan default */
-        }
-        .page-cv-biasa img {
+        .page-image img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Menyesuaikan proporsi kertas */
+            object-fit: contain; /* Memastikan gambar A4 proporsional penuh */
+            display: block;
         }
-
-        .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px;}
 
         /* --- Responsive HP --- */
         @media (max-width: 768px) {
@@ -181,7 +152,7 @@
             .a4-paper {
                 transform: scale(0.55);
                 transform-origin: top center;
-                margin-bottom: -110mm; /* Menyesuaikan skala */
+                margin-bottom: -110mm;
             }
         }
 
@@ -192,16 +163,20 @@
             .navbar, .form-panel { display: none !important; }
             .container { display: block; }
             .preview-panel { padding: 0; background-color: white; display: block; gap: 0; }
+            
             .a4-paper {
                 box-shadow: none !important;
                 margin: 0 !important;
                 width: 210mm !important;
                 height: 297mm !important;
                 transform: none !important;
-                page-break-after: always; /* Memastikan turun ke halaman baru */
+                page-break-after: always;
             }
-            /* Hilangkan halaman kosong di akhir */
             .a4-paper:last-child { page-break-after: auto; }
+            
+            /* Pertahankan margin di surat lamaran, hilangkan di gambar */
+            .page-surat { padding: 20mm 25mm !important; }
+            .page-image { padding: 0 !important; }
             
             .highlight { background-color: transparent !important; padding: 0; }
         }
@@ -227,26 +202,22 @@
             </div>
 
             <div class="form-group">
-                <label>Halaman 2 (Pilih Lampiran):</label>
+                <label>Pilih Jenis CV (Otomatis + Lampiran):</label>
                 <div class="radio-group">
                     <div class="radio-item">
-                        <input type="radio" id="cv-none" name="cvType" value="none" checked onchange="updatePreview()">
-                        <label for="cv-none">Tidak Ada (Hanya Surat)</label>
-                    </div>
-                    <div class="radio-item">
-                        <input type="radio" id="cv-ats" name="cvType" value="ats" onchange="updatePreview()">
-                        <label for="cv-ats">Gabung dengan CV ATS</label>
+                        <input type="radio" id="cv-ats" name="cvType" value="ats" checked onchange="updatePreview()">
+                        <label for="cv-ats">Gunakan CV ATS</label>
                     </div>
                     <div class="radio-item">
                         <input type="radio" id="cv-biasa" name="cvType" value="biasa" onchange="updatePreview()">
-                        <label for="cv-biasa">Gabung dengan CV Biasa</label>
+                        <label for="cv-biasa">Gunakan CV Biasa</label>
                     </div>
                 </div>
             </div>
 
             <button class="btn-download" onclick="downloadPDF()">Buat PDF Sekarang</button>
             
-            <p class="info-text"><b>Cara Unduh:</b> Klik tombol, lalu pada menu Print pilih <b>"Save as PDF"</b>. Jika Anda memilih gabung CV, otomatis PDF menjadi 2 halaman.</p>
+            <p class="info-text"><b>Cara Unduh:</b> Klik tombol, lalu pilih <b>"Save as PDF"</b>. File akan otomatis tergabung lengkap: Surat Lamaran, CV, KTP, Ijazah, Paklaring, dan SKCK.</p>
         </div>
 
         <!-- PREVIEW PANEL KANAN -->
@@ -300,67 +271,27 @@
                 </div>
             </div>
 
-            <!-- HALAMAN 2: CV ATS (Otomatis Muncul Jika Dipilih) -->
-            <div class="a4-paper page-cv-ats" id="hal-cv-ats">
-                <h1 class="nama">Samsudin Rohmatul Jefri</h1>
-                <div class="kontak">
-                    Pasuruan, Jawa Timur <span>|</span> 0821-4342-2981 <span>|</span> samsudinjefri4@gmail.com
-                </div>
-
-                <h2 class="judul-section">Ringkasan Profil</h2>
-                <p class="ringkasan">Operator Produksi berdedikasi dengan pengalaman lebih dari 3 tahun di industri manufaktur elektronik dan pengolahan hasil pertanian, serta latar belakang pendidikan Teknik Pengecoran Logam. Terbukti tangkas dalam mengoperasikan berbagai mesin industri skala besar dan alat ukur presisi. Memiliki komitmen tinggi terhadap pencapaian target produksi, Quality Control, dan penerapan standar Keselamatan dan Kesehatan Kerja (K3) di lingkungan pabrik yang dinamis.</p>
-
-                <h2 class="judul-section">Pengalaman Kerja</h2>
-
-                <div class="job-header">
-                    <span class="job-title">Crew Processing (Green Dryer)</span> | <span class="job-company">PT Syngenta Seed Indonesia</span>
-                    <span class="job-date">Ags 2025 – Okt 2025</span>
-                </div>
-                <ul class="list-pengalaman">
-                    <li>Mengoperasikan dan memantau kinerja mesin conveyor untuk memastikan kelancaran alur produksi pengeringan benih jagung secara efisien.</li>
-                    <li>Melakukan inspeksi kualitas (QC) secara berkala pada kadar air jagung agar presisi dan sesuai dengan parameter standar perusahaan.</li>
-                    <li>Menerapkan standar 5R (Ringkas, Rapi, Resik, Rawat, Rajin) untuk memastikan kebersihan, kerapian, dan keamanan area kerja di setiap pergantian shift.</li>
-                </ul>
-
-                <div class="job-header">
-                    <span class="job-title">Operator Produksi (Wood Working)</span> | <span class="job-company">PT Yamaha Electronics Manufacturing</span>
-                    <span class="job-date">Sep 2020 – 2023</span>
-                </div>
-                <ul class="list-pengalaman">
-                    <li>Mengoperasikan mesin Press dan Glue Line secara efektif guna mendukung pemenuhan target produksi harian departemen woodworking.</li>
-                    <li>Menggunakan berbagai alat ukur presisi untuk memastikan dimensi serta kualitas produk kayu sesuai dengan Standard Operating Procedure (SOP).</li>
-                    <li>Meminimalisir tingkat cacat produk (defect) melalui pengawasan kualitas komponen secara ketat di sepanjang jalur perakitan.</li>
-                </ul>
-
-                <div class="job-header">
-                    <span class="job-title">Praktik Kerja Lapangan (Foundry)</span> | <span class="job-company">PT Boma Bisma Indra (Persero)</span>
-                    <span class="job-date">Sep 2018 – Mar 2019</span>
-                </div>
-                <ul class="list-pengalaman">
-                    <li>Mendukung penuh operasional proses pengecoran logam mulai dari tahap persiapan cetakan (molding) hingga proses finishing produk.</li>
-                    <li>Mengawasi dan memantau temperatur peleburan serta proses penuangan logam cair dengan kepatuhan penuh terhadap protokol keselamatan kerja tingkat tinggi.</li>
-                </ul>
-
-                <h2 class="judul-section">Pendidikan</h2>
-                <div class="job-header">
-                    <span class="job-title">SMK Negeri 1 Grati</span>
-                    <span class="job-date">2017 – 2020</span>
-                </div>
-                <div style="margin-top: 3px; font-size: 10.5pt; color: #444;">Jurusan Teknik Pengecoran Logam</div>
-
-                <h2 class="judul-section">Keahlian & Kompetensi</h2>
-                <div class="skill-group">
-                    <span class="skill-cat">Keahlian Teknis (Hard Skills):</span> Mahir mengoperasikan Mesin Press, Glue Line, dan Conveyor; Quality Control & Jangka Sorong/Mikrometer; Pengecoran Logam & Pengelasan SMAW; Implementasi 5R/5S dan SOP.
-                </div>
-                <div class="skill-group" style="margin-top: 6px;">
-                    <span class="skill-cat">Kompetensi Inti (Soft Skills):</span> Kepatuhan Keselamatan Kerja (K3), Ketelitian ekstra (Attention to Detail), Siap bekerja sistem shift, Pemecahan masalah (troubleshooting) mesin dasar.
-                </div>
+            <!-- HALAMAN 2: PILIHAN CV (Otomatis Full Page) -->
+            <div class="a4-paper page-image" id="hal-cv-ats">
+                <img src="ats.png" alt="CV ATS">
+            </div>
+            
+            <div class="a4-paper page-image" id="hal-cv-biasa">
+                <img src="biasa.png" alt="CV Biasa">
             </div>
 
-            <!-- HALAMAN 2: CV BIASA / KREATIF (Otomatis Muncul Jika Dipilih) -->
-            <div class="a4-paper page-cv-biasa" id="hal-cv-biasa">
-                <!-- GAMBAR CV KREATIF AKAN MUNCUL DI SINI -->
-                <img src="cv-biasa.jpg" alt="CV Kreatif Samsudin">
+            <!-- HALAMAN 3-6: LAMPIRAN OTOMATIS (Full Page) -->
+            <div class="a4-paper page-image lampiran-doc">
+                <img src="ijazah.png" alt="Ijazah">
+            </div>
+            <div class="a4-paper page-image lampiran-doc">
+                <img src="ktp.png" alt="KTP">
+            </div>
+            <div class="a4-paper page-image lampiran-doc">
+                <img src="paklaring.png" alt="Paklaring">
+            </div>
+            <div class="a4-paper page-image lampiran-doc">
+                <img src="skck.png" alt="SKCK">
             </div>
 
         </div>
@@ -377,7 +308,7 @@
         };
 
         function updatePreview() {
-            // Update Teks Surat Lamaran
+            // 1. Update Teks Surat Lamaran
             let kota = document.getElementById('inputKota').value;
             let pt = document.getElementById('inputPT').value;
             
@@ -393,27 +324,21 @@
             prevPT.style.backgroundColor = pt ? "transparent" : "#ffffcc";
             prevPT2.style.backgroundColor = pt ? "transparent" : "#ffffcc";
 
-            // LOGIKA HALAMAN 2 (Pilihan CV)
+            // 2. Logika Pilihan CV (Tampilkan yang dipilih saja)
             let pilihanCV = document.querySelector('input[name="cvType"]:checked').value;
-            
-            const halATS = document.getElementById('hal-cv-ats');
-            const halBiasa = document.getElementById('hal-cv-biasa');
+            document.getElementById('hal-cv-ats').style.display = (pilihanCV === 'ats') ? 'block' : 'none';
+            document.getElementById('hal-cv-biasa').style.display = (pilihanCV === 'biasa') ? 'block' : 'none';
 
-            // Default: Sembunyikan keduanya
-            halATS.style.display = "none";
-            halBiasa.style.display = "none";
-
-            // Tampilkan sesuai pilihan
-            if (pilihanCV === "ats") {
-                halATS.style.display = "block";
-            } else if (pilihanCV === "biasa") {
-                halBiasa.style.display = "block";
-            }
+            // 3. Selalu tampilkan lampiran (Ijazah, KTP, dll) di bawah CV
+            let lampiran = document.querySelectorAll('.lampiran-doc');
+            lampiran.forEach(doc => {
+                doc.style.display = 'block';
+            });
         }
 
         function downloadPDF() {
             let ptName = document.getElementById('inputPT').value;
-            let finalName = ptName ? 'Lamaran_dan_CV_Samsudin_' + ptName.replace(/ /g, '_') : 'Surat_Lamaran_Samsudin';
+            let finalName = ptName ? 'Berkas_Lamaran_Samsudin_' + ptName.replace(/ /g, '_') : 'Berkas_Lamaran_Samsudin';
             
             let originalTitle = document.title;
             document.title = finalName;
