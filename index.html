@@ -50,9 +50,7 @@
         }
         
         /* Form Styles */
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 20px; }
         label {
             display: block;
             margin-bottom: 8px;
@@ -85,9 +83,7 @@
             transition: background 0.3s;
             margin-top: 10px;
         }
-        .btn-download:hover {
-            background-color: #218838;
-        }
+        .btn-download:hover { background-color: #218838; }
         .info-text {
             font-size: 0.8rem;
             color: #666;
@@ -95,73 +91,49 @@
             text-align: justify;
         }
 
-        /* A4 Paper Styles (Preview Website) */
+        /* --- A4 Paper Styles (Preview Website & Format KTP) --- */
         .a4-paper {
             width: 210mm;
-            min-height: 297mm;
+            min-height: 297mm; /* Ukuran A4 standar */
             background: white;
-            padding: 25mm 30mm;
+            padding: 20mm 25mm; /* Margin diperkecil agar pas 1 halaman */
             box-sizing: border-box;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            
+            /* Font khusus isi surat lamaran */
+            font-family: 'Arial', Helvetica, sans-serif;
             font-size: 11pt;
-            line-height: 1.5;
-            color: #2b2b2b;
-        }
-        .a4-paper .header {
-            text-align: center;
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 15px;
-            margin-bottom: 30px;
-        }
-        .a4-paper h1 {
-            font-size: 20pt;
-            text-transform: uppercase;
-            margin: 0 0 5px 0;
-            color: var(--primary);
-            letter-spacing: 1.5px;
-        }
-        .a4-paper .contact-info {
-            font-size: 10pt;
-            color: #555555;
-        }
-        .a4-paper .contact-info span {
-            margin: 0 5px;
-            color: var(--primary);
-        }
-        .a4-paper .tanggal {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-        .a4-paper .penerima {
-            margin-bottom: 25px;
-        }
-        .a4-paper p {
-            margin-top: 0;
-            margin-bottom: 12px;
+            line-height: 1.4; /* Dirapatkan agar tidak meluber */
+            color: #000;
             text-align: justify;
         }
-        .a4-paper .lampiran-list {
-            margin-top: 5px;
-            margin-bottom: 15px;
-            padding-left: 20px;
+        
+        /* CSS Khusus Format Isi Surat Lamaran */
+        .a4-paper .right-align { text-align: right; margin-bottom: 20px; }
+        .a4-paper .no-margin { margin: 0; }
+        .a4-paper .mb-3 { margin-bottom: 15px; }
+        .a4-paper p { margin-top: 0; margin-bottom: 12px; }
+        
+        /* Tabel Biodata */
+        .a4-paper table { 
+            border-collapse: collapse; 
+            margin-left: 20px; 
+            margin-bottom: 15px; 
+            width: 100%; 
         }
-        .a4-paper .lampiran-list li {
-            margin-bottom: 4px;
-        }
-        .a4-paper .ttd {
-            margin-top: 30px;
-            float: right;
-            text-align: center;
-            width: 250px;
-        }
-        .a4-paper .nama-ttd {
-            margin-top: 70px;
-            font-weight: bold;
-            text-decoration: underline;
-        }
-        .highlight {
-            background-color: #ffffcc;
-        }
+        .a4-paper td { padding: 1px 5px 1px 0; vertical-align: top; }
+        .a4-paper .col-1 { width: 105px; }
+        .a4-paper .col-2 { width: 10px; }
+        
+        /* List Lampiran */
+        .a4-paper ol { margin-top: 5px; margin-bottom: 15px; padding-left: 40px; }
+        .a4-paper li { margin-bottom: 2px; }
+        
+        /* Tanda Tangan */
+        .a4-paper .ttd { margin-top: 25px; }
+        .a4-paper .nama-ttd { font-weight: bold; margin-top: 60px; }
+        
+        .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px;}
 
         /* Responsive Layout untuk HP */
         @media (max-width: 768px) {
@@ -170,27 +142,22 @@
             .a4-paper {
                 transform: scale(0.55);
                 transform-origin: top center;
-                margin-bottom: -60%;
+                margin-bottom: -60%; /* Menyesuaikan tinggi preview di HP */
             }
         }
 
-        /* KHUSUS UNTUK HASIL DOWNLOAD PDF (PRINT TO PDF) */
+        /* --- KHUSUS UNTUK HASIL DOWNLOAD PDF (PRINT TO PDF) --- */
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 0; /* Dibuat 0 agar padding dari a4-paper yang bekerja penuh */
+                margin: 0; 
             }
             body {
                 background-color: white;
                 -webkit-print-color-adjust: exact;
             }
-            /* Hilangkan menu kiri dan tombol saat dicetak */
-            .navbar, .form-panel {
-                display: none !important;
-            }
-            .container {
-                display: block;
-            }
+            .navbar, .form-panel { display: none !important; }
+            .container { display: block; }
             .preview-panel {
                 padding: 0;
                 background-color: white;
@@ -199,14 +166,12 @@
             .a4-paper {
                 box-shadow: none !important;
                 margin: 0 !important;
-                padding: 25mm 30mm !important;
+                padding: 20mm 25mm !important; /* Presisi Margin 1 Halaman */
                 width: 210mm !important;
                 height: 297mm !important;
-                transform: none !important; /* Kembalikan ukuran asli di HP */
+                transform: none !important;
             }
-            .highlight {
-                background-color: transparent !important;
-            }
+            .highlight { background-color: transparent !important; padding: 0; }
         }
     </style>
 </head>
@@ -223,7 +188,7 @@
             
             <div class="form-group">
                 <label for="inputKota">Kota & Tanggal Lamaran</label>
-                <input type="text" id="inputKota" placeholder="Contoh: Pasuruan, 20 Juli 2026" onkeyup="updatePreview()">
+                <input type="text" id="inputKota" placeholder="Contoh: Pasuruan, 18 Juli 2026" onkeyup="updatePreview()">
             </div>
 
             <div class="form-group">
@@ -233,60 +198,63 @@
 
             <button class="btn-download" onclick="downloadPDF()">Buat PDF Sekarang</button>
             
-            <p class="info-text"><b>Cara Unduh:</b> Setelah klik tombol di atas, akan muncul menu Print. Pilih <b>"Save as PDF / Simpan sebagai PDF"</b> lalu tekan Save.</p>
+            <p class="info-text"><b>Cara Unduh:</b> Setelah klik tombol di atas, akan muncul menu Print dari HP/Laptop. Pilih <b>"Save as PDF / Simpan sebagai PDF"</b> lalu tekan Save.</p>
         </div>
 
         <!-- PREVIEW PANEL -->
         <div class="preview-panel">
             <div class="a4-paper" id="surat-lamaran">
-                <div class="header">
-                    <h1>Samsudin Rohmatul Jefri</h1>
-                    <div class="contact-info">
-                        Pasuruan, Jawa Timur <span>|</span> 0821-4342-2981 <span>|</span> samsudinjefri4@gmail.com
-                    </div>
+                <!-- ISI SURAT LAMARAN (FORMAT KTP) -->
+                <div class="right-align highlight" id="preview-kota">Pasuruan, ............................</div>
+
+                <div class="mb-3">
+                    <p class="no-margin">Hal: Lamaran Pekerjaan – Operator Produksi</p>
+                    <p class="no-margin">Lampiran: 6 (Enam) Berkas</p>
                 </div>
-            
-                <div class="content">
-                    <div class="tanggal" id="preview-kota" class="highlight">Pasuruan, ............................</div>
-            
-                    <div class="penerima">
-                        Hal: <b>Lamaran Pekerjaan</b><br>
-                        Lampiran: 6 (Enam) Lembar / Berkas<br><br>
-                        Yth. HRD Manager<br>
-                        <b id="preview-pt" class="highlight">[Nama Perusahaan Tujuan]</b><br>
-                        di Tempat
-                    </div>
-            
-                    <p>Dengan hormat,</p>
-            
-                    <p>Melalui surat ini, saya bermaksud melamar posisi <b>Operator Produksi</b> di perusahaan yang Bapak/Ibu pimpin. Saya adalah lulusan Teknik Pengecoran Logam dari SMK Negeri 1 Grati dengan pengalaman kerja lebih dari 3 tahun di industri manufaktur (PT Yamaha Electronics Manufacturing dan PT Syngenta Seed Indonesia).</p>
-            
-                    <p>Selama bekerja, saya terbiasa mengoperasikan mesin produksi skala besar (seperti <i>Press, Glue Line,</i> dan <i>Conveyor</i>), melakukan <i>Quality Control</i> (QC) secara ketat menggunakan alat ukur presisi, serta menerapkan budaya 5R dan standar Keselamatan Kerja (K3) secara disiplin di bawah target harian dan sistem <i>shift</i>.</p>
-            
-                    <p>Sebagai bahan pertimbangan Bapak/Ibu, bersama surat ini turut saya lampirkan kelengkapan administrasi sebagai berikut:</p>
-                    
-                    <ol class="lampiran-list">
-                        <li>Curriculum Vitae (CV)</li>
-                        <li>Fotokopi Ijazah Terakhir</li>
-                        <li>Surat Keterangan Pengalaman Kerja (Paklaring)</li>
-                        <li>Fotokopi Surat Keterangan Catatan Kepolisian (SKCK)</li>
-                        <li>Fotokopi Kartu Tanda Penduduk (KTP)</li>
-                        <li>Pas Foto Terbaru</li>
-                    </ol>
-            
-                    <p>Saya sangat berharap dapat diberikan kesempatan wawancara untuk menjelaskan lebih detail kualifikasi yang saya miliki dan bagaimana saya bisa berkontribusi di perusahaan Bapak/Ibu. Atas perhatian dan waktu yang diberikan, saya ucapkan terima kasih.</p>
-            
-                    <div class="ttd">
-                        Hormat saya,<br>
-                        <div class="nama-ttd">Samsudin Rohmatul Jefri</div>
-                    </div>
+
+                <div class="mb-3">
+                    <p class="no-margin"><b>Yth. HRD Manager <span id="preview-pt" class="highlight">[Nama Perusahaan]</span></b></p>
+                    <p class="no-margin"><b>Di Tempat</b></p>
+                </div>
+
+                <p><b>Dengan hormat,</b></p>
+
+                <p style="margin-bottom: 8px;">Berdasarkan informasi lowongan pekerjaan yang saya terima, melalui surat ini saya bermaksud melamar posisi <b>Operator Produksi di <span id="preview-pt2" class="highlight">[Nama Perusahaan]</span></b>. Berikut adalah data diri singkat saya:</p>
+
+                <table>
+                    <tr><td class="col-1">Nama</td><td class="col-2">:</td><td>Samsudin Rohmatul Jefri</td></tr>
+                    <tr><td class="col-1">Pendidikan</td><td class="col-2">:</td><td>SMK Negeri 1 Grati – Teknik Pengecoran Logam</td></tr>
+                    <tr><td class="col-1">Status Nikah</td><td class="col-2">:</td><td>Menikah</td></tr>
+                    <tr><td class="col-1">Alamat</td><td class="col-2">:</td><td>Dsn. Krajan RT 001/RW 008, Desa Plososari, Kec. Grati, Kab. Pasuruan, Jawa Timur</td></tr>
+                    <tr><td class="col-1">No. Telp</td><td class="col-2">:</td><td>0821 4342 2981</td></tr>
+                </table>
+
+                <p>Saya adalah individu yang disiplin, cekatan, dan memiliki ketahanan fisik prima untuk bekerja dengan target harian di lingkungan pabrik. Saya menaruh minat besar pada proses manufaktur, serta memiliki pemahaman yang kuat terkait standar Keselamatan dan Kesehatan Kerja (K3) dan penerapan budaya 5R di area kerja.</p>
+
+                <p>Sebagai informasi, saya memiliki pengalaman lebih dari 3 tahun di industri manufaktur (PT Yamaha Electronics Manufacturing Indonesia dan PT Syngenta Seed Indonesia). Pengalaman ini melatih saya untuk tangkas mengoperasikan mesin produksi skala besar (seperti mesin <i>Press, Glue Line</i>, dan <i>Conveyor</i>), serta cermat melakukan <i>Quality Control</i> (QC) presisi guna memastikan standar <i>zero defect</i>.</p>
+
+                <p style="margin-bottom: 0;">Sebagai bahan pertimbangan Bapak/Ibu, saya turut melampirkan:</p>
+                <ol>
+                    <li>Curriculum Vitae (CV)</li>
+                    <li>Fotokopi Ijazah</li>
+                    <li>Fotokopi KTP</li>
+                    <li>Surat Keterangan Pengalaman Kerja (Paklaring)</li>
+                    <li>Fotokopi SKCK</li>
+                    <li>Pasfoto Terbaru</li>
+                </ol>
+
+                <p>Besar harapan saya untuk dapat mengikuti tahapan wawancara agar saya bisa menjelaskan lebih detail mengenai kualifikasi saya. Atas waktu dan perhatian Bapak/Ibu, saya ucapkan terima kasih.</p>
+
+                <div class="ttd">
+                    <p class="no-margin"><b>Hormat saya,</b></p>
+                    <p class="nama-ttd">Samsudin Rohmatul Jefri</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Auto set tanggal hari ini otomatis
+        // Auto set tanggal hari ini otomatis (Format Indonesia)
         window.onload = function() {
             const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const today = new Date();
@@ -302,14 +270,17 @@
             
             const prevKota = document.getElementById('preview-kota');
             const prevPT = document.getElementById('preview-pt');
+            const prevPT2 = document.getElementById('preview-pt2'); // Target PT di dalam paragraf pertama
 
             // Update text
             prevKota.innerText = kota ? kota : "Pasuruan, ............................";
-            prevPT.innerText = pt ? pt : "[Nama Perusahaan Tujuan]";
+            prevPT.innerText = pt ? pt : "[Nama Perusahaan]";
+            prevPT2.innerText = pt ? pt : "[Nama Perusahaan]";
             
-            // Hilangkan efek warna kuning jika sudah diketik
+            // Hilangkan efek warna kuning jika field sudah diketik
             prevKota.style.backgroundColor = kota ? "transparent" : "#ffffcc";
             prevPT.style.backgroundColor = pt ? "transparent" : "#ffffcc";
+            prevPT2.style.backgroundColor = pt ? "transparent" : "#ffffcc";
         }
 
         // Fungsi Download PDF menggunakan sistem Native Print Browser
@@ -320,6 +291,7 @@
             
             // Simpan title website asli
             let originalTitle = document.title;
+            
             // Ganti title sementara agar nama file PDF mengikuti nama ini
             document.title = finalName;
             
@@ -332,3 +304,4 @@
     </script>
 </body>
 </html>
+
