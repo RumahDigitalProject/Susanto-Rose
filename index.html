@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto-Generate Surat Lamaran | Samsudin Jefri</title>
+    <title>Auto-Generate Lamaran & CV | Samsudin Jefri</title>
     <style>
         :root {
             --primary: #1a365d;
@@ -45,11 +45,13 @@
             padding: 20px;
             overflow-y: auto;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             background-color: #525659;
+            gap: 20px; /* Jarak antar halaman A4 di layar preview */
         }
         
-        /* Form Styles */
+        /* --- Form Styles --- */
         .form-group { margin-bottom: 20px; }
         label {
             display: block;
@@ -66,10 +68,22 @@
             font-size: 1rem;
             box-sizing: border-box;
         }
-        input[type="text"]:focus {
-            border-color: var(--primary);
-            outline: none;
+        input[type="text"]:focus { border-color: var(--primary); outline: none; }
+        
+        .radio-group {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
         }
+        .radio-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .radio-item input { margin-right: 8px; cursor: pointer; }
+        .radio-item label { margin-bottom: 0; font-weight: normal; cursor: pointer; }
+
         .btn-download {
             background-color: #28a745;
             color: white;
@@ -84,127 +98,162 @@
             margin-top: 10px;
         }
         .btn-download:hover { background-color: #218838; }
-        .info-text {
-            font-size: 0.8rem;
-            color: #666;
-            margin-top: 15px;
-            text-align: justify;
-        }
+        .info-text { font-size: 0.8rem; color: #666; margin-top: 15px; text-align: justify; }
 
-        /* --- A4 Paper Styles (Preview Website & Format KTP) --- */
+        /* --- Kertas A4 Master --- */
         .a4-paper {
             width: 210mm;
-            min-height: 297mm; /* Ukuran A4 standar */
+            min-height: 297mm;
             background: white;
-            padding: 20mm 25mm; /* Margin diperkecil agar pas 1 halaman */
             box-sizing: border-box;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            
-            /* Font khusus isi surat lamaran */
+            position: relative;
+        }
+
+        /* --- HALAMAN 1: CSS SURAT LAMARAN (KTP) --- */
+        .page-surat {
+            padding: 20mm 25mm;
             font-family: 'Arial', Helvetica, sans-serif;
             font-size: 11pt;
-            line-height: 1.4; /* Dirapatkan agar tidak meluber */
+            line-height: 1.4;
             color: #000;
             text-align: justify;
         }
-        
-        /* CSS Khusus Format Isi Surat Lamaran */
-        .a4-paper .right-align { text-align: right; margin-bottom: 20px; }
-        .a4-paper .no-margin { margin: 0; }
-        .a4-paper .mb-3 { margin-bottom: 15px; }
-        .a4-paper p { margin-top: 0; margin-bottom: 12px; }
-        
-        /* Tabel Biodata */
-        .a4-paper table { 
-            border-collapse: collapse; 
-            margin-left: 20px; 
-            margin-bottom: 15px; 
-            width: 100%; 
+        .page-surat .right-align { text-align: right; margin-bottom: 20px; }
+        .page-surat .no-margin { margin: 0; }
+        .page-surat .mb-3 { margin-bottom: 15px; }
+        .page-surat p { margin-top: 0; margin-bottom: 12px; }
+        .page-surat table { border-collapse: collapse; margin-left: 20px; margin-bottom: 15px; width: 100%; }
+        .page-surat td { padding: 1px 5px 1px 0; vertical-align: top; }
+        .page-surat .col-1 { width: 105px; }
+        .page-surat .col-2 { width: 10px; }
+        .page-surat ol { margin-top: 5px; margin-bottom: 15px; padding-left: 40px; }
+        .page-surat li { margin-bottom: 2px; }
+        .page-surat .ttd { margin-top: 25px; }
+        .page-surat .nama-ttd { font-weight: bold; margin-top: 60px; }
+
+        /* --- HALAMAN 2: CSS CV ATS (V3) --- */
+        .page-cv-ats {
+            padding: 20mm 25mm;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #2b2b2b;
+            display: none; /* Disembunyikan default */
         }
-        .a4-paper td { padding: 1px 5px 1px 0; vertical-align: top; }
-        .a4-paper .col-1 { width: 105px; }
-        .a4-paper .col-2 { width: 10px; }
-        
-        /* List Lampiran */
-        .a4-paper ol { margin-top: 5px; margin-bottom: 15px; padding-left: 40px; }
-        .a4-paper li { margin-bottom: 2px; }
-        
-        /* Tanda Tangan */
-        .a4-paper .ttd { margin-top: 25px; }
-        .a4-paper .nama-ttd { font-weight: bold; margin-top: 60px; }
-        
+        .page-cv-ats h1.nama {
+            font-size: 22pt; text-align: center; text-transform: uppercase; margin: 0 0 5px 0; color: var(--primary); letter-spacing: 1.5px;
+        }
+        .page-cv-ats .kontak {
+            text-align: center; font-size: 10pt; margin-bottom: 22px; color: #555555;
+        }
+        .page-cv-ats .kontak span { color: var(--primary); margin: 0 5px; }
+        .page-cv-ats h2.judul-section {
+            font-size: 12.5pt; color: var(--primary); border-bottom: 1.5px solid var(--primary); padding-bottom: 4px; margin-top: 22px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .page-cv-ats p.ringkasan { text-align: justify; margin-top: 0; font-size: 10.5pt; }
+        .page-cv-ats .job-header { width: 100%; margin-bottom: 2px; position: relative; }
+        .page-cv-ats .job-title { font-weight: bold; font-size: 11pt; color: #000; }
+        .page-cv-ats .job-company { font-size: 11pt; color: #444; }
+        .page-cv-ats .job-date { position: absolute; right: 0; top: 0; font-weight: bold; color: var(--primary); font-size: 10pt; }
+        .page-cv-ats ul.list-pengalaman { margin-top: 4px; margin-bottom: 15px; padding-left: 18px; }
+        .page-cv-ats ul.list-pengalaman li { margin-bottom: 4px; text-align: justify; font-size: 10.5pt; }
+        .page-cv-ats .skill-group { margin-bottom: 6px; font-size: 10.5pt; }
+        .page-cv-ats .skill-cat { font-weight: bold; color: var(--primary); }
+
+        /* --- HALAMAN 2: CSS CV BIASA (GAMBAR) --- */
+        .page-cv-biasa {
+            padding: 0; /* Tanpa margin agar gambar bisa full A4 */
+            display: none; /* Disembunyikan default */
+        }
+        .page-cv-biasa img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Menyesuaikan proporsi kertas */
+        }
+
         .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px;}
 
-        /* Responsive Layout untuk HP */
+        /* --- Responsive HP --- */
         @media (max-width: 768px) {
             .container { flex-direction: column; }
             .form-panel { width: 100%; border-bottom: 1px solid #ccc; }
             .a4-paper {
                 transform: scale(0.55);
                 transform-origin: top center;
-                margin-bottom: -60%; /* Menyesuaikan tinggi preview di HP */
+                margin-bottom: -110mm; /* Menyesuaikan skala */
             }
         }
 
-        /* --- KHUSUS UNTUK HASIL DOWNLOAD PDF (PRINT TO PDF) --- */
+        /* --- CSS KHUSUS PRINT PDF --- */
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 0; 
-            }
-            body {
-                background-color: white;
-                -webkit-print-color-adjust: exact;
-            }
+            @page { size: A4 portrait; margin: 0; }
+            body { background-color: white; -webkit-print-color-adjust: exact; }
             .navbar, .form-panel { display: none !important; }
             .container { display: block; }
-            .preview-panel {
-                padding: 0;
-                background-color: white;
-                display: block;
-            }
+            .preview-panel { padding: 0; background-color: white; display: block; gap: 0; }
             .a4-paper {
                 box-shadow: none !important;
                 margin: 0 !important;
-                padding: 20mm 25mm !important; /* Presisi Margin 1 Halaman */
                 width: 210mm !important;
                 height: 297mm !important;
                 transform: none !important;
+                page-break-after: always; /* Memastikan turun ke halaman baru */
             }
+            /* Hilangkan halaman kosong di akhir */
+            .a4-paper:last-child { page-break-after: auto; }
+            
             .highlight { background-color: transparent !important; padding: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div class="navbar">
-        Surat Lamaran Generator - Samsudin Jefri
-    </div>
+    <div class="navbar">Surat Lamaran Generator - Samsudin Jefri</div>
 
     <div class="container">
-        <!-- FORM PANEL -->
+        <!-- FORM PANEL KIRI -->
         <div class="form-panel">
             <h3>Isi Data Lamaran</h3>
             
             <div class="form-group">
-                <label for="inputKota">Kota & Tanggal Lamaran</label>
+                <label>Kota & Tanggal</label>
                 <input type="text" id="inputKota" placeholder="Contoh: Pasuruan, 18 Juli 2026" onkeyup="updatePreview()">
             </div>
 
             <div class="form-group">
-                <label for="inputPT">Nama Perusahaan Tujuan</label>
+                <label>Nama Perusahaan Tujuan</label>
                 <input type="text" id="inputPT" placeholder="Contoh: PT Indofood CBP" onkeyup="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>Halaman 2 (Pilih Lampiran):</label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="cv-none" name="cvType" value="none" checked onchange="updatePreview()">
+                        <label for="cv-none">Tidak Ada (Hanya Surat)</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="cv-ats" name="cvType" value="ats" onchange="updatePreview()">
+                        <label for="cv-ats">Gabung dengan CV ATS</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="cv-biasa" name="cvType" value="biasa" onchange="updatePreview()">
+                        <label for="cv-biasa">Gabung dengan CV Biasa</label>
+                    </div>
+                </div>
             </div>
 
             <button class="btn-download" onclick="downloadPDF()">Buat PDF Sekarang</button>
             
-            <p class="info-text"><b>Cara Unduh:</b> Setelah klik tombol di atas, akan muncul menu Print dari HP/Laptop. Pilih <b>"Save as PDF / Simpan sebagai PDF"</b> lalu tekan Save.</p>
+            <p class="info-text"><b>Cara Unduh:</b> Klik tombol, lalu pada menu Print pilih <b>"Save as PDF"</b>. Jika Anda memilih gabung CV, otomatis PDF menjadi 2 halaman.</p>
         </div>
 
-        <!-- PREVIEW PANEL -->
+        <!-- PREVIEW PANEL KANAN -->
         <div class="preview-panel">
-            <div class="a4-paper" id="surat-lamaran">
-                <!-- ISI SURAT LAMARAN (FORMAT KTP) -->
+            
+            <!-- HALAMAN 1: SURAT LAMARAN -->
+            <div class="a4-paper page-surat" id="hal-surat">
                 <div class="right-align highlight" id="preview-kota">Pasuruan, ............................</div>
 
                 <div class="mb-3">
@@ -213,7 +262,6 @@
                 </div>
 
                 <div class="mb-3">
-                    <!-- BAGIAN YANG DIREVISI MENJADI BAPAK/IBU HRD -->
                     <p class="no-margin"><b>Yth. Bapak/Ibu HRD <span id="preview-pt" class="highlight">[Nama Perusahaan]</span></b></p>
                     <p class="no-margin"><b>Di Tempat</b></p>
                 </div>
@@ -251,11 +299,74 @@
                     <p class="nama-ttd">Samsudin Rohmatul Jefri</p>
                 </div>
             </div>
+
+            <!-- HALAMAN 2: CV ATS (Otomatis Muncul Jika Dipilih) -->
+            <div class="a4-paper page-cv-ats" id="hal-cv-ats">
+                <h1 class="nama">Samsudin Rohmatul Jefri</h1>
+                <div class="kontak">
+                    Pasuruan, Jawa Timur <span>|</span> 0821-4342-2981 <span>|</span> samsudinjefri4@gmail.com
+                </div>
+
+                <h2 class="judul-section">Ringkasan Profil</h2>
+                <p class="ringkasan">Operator Produksi berdedikasi dengan pengalaman lebih dari 3 tahun di industri manufaktur elektronik dan pengolahan hasil pertanian, serta latar belakang pendidikan Teknik Pengecoran Logam. Terbukti tangkas dalam mengoperasikan berbagai mesin industri skala besar dan alat ukur presisi. Memiliki komitmen tinggi terhadap pencapaian target produksi, Quality Control, dan penerapan standar Keselamatan dan Kesehatan Kerja (K3) di lingkungan pabrik yang dinamis.</p>
+
+                <h2 class="judul-section">Pengalaman Kerja</h2>
+
+                <div class="job-header">
+                    <span class="job-title">Crew Processing (Green Dryer)</span> | <span class="job-company">PT Syngenta Seed Indonesia</span>
+                    <span class="job-date">Ags 2025 – Okt 2025</span>
+                </div>
+                <ul class="list-pengalaman">
+                    <li>Mengoperasikan dan memantau kinerja mesin conveyor untuk memastikan kelancaran alur produksi pengeringan benih jagung secara efisien.</li>
+                    <li>Melakukan inspeksi kualitas (QC) secara berkala pada kadar air jagung agar presisi dan sesuai dengan parameter standar perusahaan.</li>
+                    <li>Menerapkan standar 5R (Ringkas, Rapi, Resik, Rawat, Rajin) untuk memastikan kebersihan, kerapian, dan keamanan area kerja di setiap pergantian shift.</li>
+                </ul>
+
+                <div class="job-header">
+                    <span class="job-title">Operator Produksi (Wood Working)</span> | <span class="job-company">PT Yamaha Electronics Manufacturing</span>
+                    <span class="job-date">Sep 2020 – 2023</span>
+                </div>
+                <ul class="list-pengalaman">
+                    <li>Mengoperasikan mesin Press dan Glue Line secara efektif guna mendukung pemenuhan target produksi harian departemen woodworking.</li>
+                    <li>Menggunakan berbagai alat ukur presisi untuk memastikan dimensi serta kualitas produk kayu sesuai dengan Standard Operating Procedure (SOP).</li>
+                    <li>Meminimalisir tingkat cacat produk (defect) melalui pengawasan kualitas komponen secara ketat di sepanjang jalur perakitan.</li>
+                </ul>
+
+                <div class="job-header">
+                    <span class="job-title">Praktik Kerja Lapangan (Foundry)</span> | <span class="job-company">PT Boma Bisma Indra (Persero)</span>
+                    <span class="job-date">Sep 2018 – Mar 2019</span>
+                </div>
+                <ul class="list-pengalaman">
+                    <li>Mendukung penuh operasional proses pengecoran logam mulai dari tahap persiapan cetakan (molding) hingga proses finishing produk.</li>
+                    <li>Mengawasi dan memantau temperatur peleburan serta proses penuangan logam cair dengan kepatuhan penuh terhadap protokol keselamatan kerja tingkat tinggi.</li>
+                </ul>
+
+                <h2 class="judul-section">Pendidikan</h2>
+                <div class="job-header">
+                    <span class="job-title">SMK Negeri 1 Grati</span>
+                    <span class="job-date">2017 – 2020</span>
+                </div>
+                <div style="margin-top: 3px; font-size: 10.5pt; color: #444;">Jurusan Teknik Pengecoran Logam</div>
+
+                <h2 class="judul-section">Keahlian & Kompetensi</h2>
+                <div class="skill-group">
+                    <span class="skill-cat">Keahlian Teknis (Hard Skills):</span> Mahir mengoperasikan Mesin Press, Glue Line, dan Conveyor; Quality Control & Jangka Sorong/Mikrometer; Pengecoran Logam & Pengelasan SMAW; Implementasi 5R/5S dan SOP.
+                </div>
+                <div class="skill-group" style="margin-top: 6px;">
+                    <span class="skill-cat">Kompetensi Inti (Soft Skills):</span> Kepatuhan Keselamatan Kerja (K3), Ketelitian ekstra (Attention to Detail), Siap bekerja sistem shift, Pemecahan masalah (troubleshooting) mesin dasar.
+                </div>
+            </div>
+
+            <!-- HALAMAN 2: CV BIASA / KREATIF (Otomatis Muncul Jika Dipilih) -->
+            <div class="a4-paper page-cv-biasa" id="hal-cv-biasa">
+                <!-- GAMBAR CV KREATIF AKAN MUNCUL DI SINI -->
+                <img src="cv-biasa.jpg" alt="CV Kreatif Samsudin">
+            </div>
+
         </div>
     </div>
 
     <script>
-        // Auto set tanggal hari ini otomatis (Format Indonesia)
         window.onload = function() {
             const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const today = new Date();
@@ -266,40 +377,49 @@
         };
 
         function updatePreview() {
+            // Update Teks Surat Lamaran
             let kota = document.getElementById('inputKota').value;
             let pt = document.getElementById('inputPT').value;
             
             const prevKota = document.getElementById('preview-kota');
             const prevPT = document.getElementById('preview-pt');
-            const prevPT2 = document.getElementById('preview-pt2'); // Target PT di dalam paragraf pertama
+            const prevPT2 = document.getElementById('preview-pt2');
 
-            // Update text
             prevKota.innerText = kota ? kota : "Pasuruan, ............................";
             prevPT.innerText = pt ? pt : "[Nama Perusahaan]";
             prevPT2.innerText = pt ? pt : "[Nama Perusahaan]";
             
-            // Hilangkan efek warna kuning jika field sudah diketik
             prevKota.style.backgroundColor = kota ? "transparent" : "#ffffcc";
             prevPT.style.backgroundColor = pt ? "transparent" : "#ffffcc";
             prevPT2.style.backgroundColor = pt ? "transparent" : "#ffffcc";
+
+            // LOGIKA HALAMAN 2 (Pilihan CV)
+            let pilihanCV = document.querySelector('input[name="cvType"]:checked').value;
+            
+            const halATS = document.getElementById('hal-cv-ats');
+            const halBiasa = document.getElementById('hal-cv-biasa');
+
+            // Default: Sembunyikan keduanya
+            halATS.style.display = "none";
+            halBiasa.style.display = "none";
+
+            // Tampilkan sesuai pilihan
+            if (pilihanCV === "ats") {
+                halATS.style.display = "block";
+            } else if (pilihanCV === "biasa") {
+                halBiasa.style.display = "block";
+            }
         }
 
-        // Fungsi Download PDF menggunakan sistem Native Print Browser
         function downloadPDF() {
-            // Ubah nama file otomatis sesuai nama PT
             let ptName = document.getElementById('inputPT').value;
-            let finalName = ptName ? 'Surat_Lamaran_Samsudin_' + ptName.replace(/ /g, '_') : 'Surat_Lamaran_Samsudin';
+            let finalName = ptName ? 'Lamaran_dan_CV_Samsudin_' + ptName.replace(/ /g, '_') : 'Surat_Lamaran_Samsudin';
             
-            // Simpan title website asli
             let originalTitle = document.title;
-            
-            // Ganti title sementara agar nama file PDF mengikuti nama ini
             document.title = finalName;
             
-            // Buka dialog Print (Save as PDF)
             window.print();
             
-            // Kembalikan title asli setelah jendela print ditutup
             document.title = originalTitle;
         }
     </script>
