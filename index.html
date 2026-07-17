@@ -4,15 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auto-Generate Surat Lamaran | Samsudin Jefri</title>
-    <!-- Library html2pdf untuk mendownload PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --primary: #1a365d;
             --bg-color: #f3f4f6;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
             padding: 0;
@@ -62,7 +60,7 @@
             color: #333;
             font-size: 0.9rem;
         }
-        input[type="text"], input[type="date"] {
+        input[type="text"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
@@ -70,7 +68,7 @@
             font-size: 1rem;
             box-sizing: border-box;
         }
-        input[type="text"]:focus, input[type="date"]:focus {
+        input[type="text"]:focus {
             border-color: var(--primary);
             outline: none;
         }
@@ -94,10 +92,10 @@
             font-size: 0.8rem;
             color: #666;
             margin-top: 15px;
-            text-align: center;
+            text-align: justify;
         }
 
-        /* A4 Paper Styles (Preview) */
+        /* A4 Paper Styles (Preview Website) */
         .a4-paper {
             width: 210mm;
             min-height: 297mm;
@@ -105,12 +103,10 @@
             padding: 25mm 30mm;
             box-sizing: border-box;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 11pt;
             line-height: 1.5;
             color: #2b2b2b;
         }
-        /* Specific elements inside A4 */
         .a4-paper .header {
             text-align: center;
             border-bottom: 2px solid var(--primary);
@@ -163,26 +159,53 @@
             font-weight: bold;
             text-decoration: underline;
         }
-        
         .highlight {
             background-color: #ffffcc;
-            transition: background-color 0.3s;
         }
 
-        /* Responsive */
+        /* Responsive Layout untuk HP */
         @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
+            .container { flex-direction: column; }
+            .form-panel { width: 100%; border-bottom: 1px solid #ccc; }
+            .a4-paper {
+                transform: scale(0.55);
+                transform-origin: top center;
+                margin-bottom: -60%;
             }
-            .form-panel {
-                width: 100%;
-                box-sizing: border-box;
-                border-bottom: 1px solid #ccc;
+        }
+
+        /* KHUSUS UNTUK HASIL DOWNLOAD PDF (PRINT TO PDF) */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0; /* Dibuat 0 agar padding dari a4-paper yang bekerja penuh */
+            }
+            body {
+                background-color: white;
+                -webkit-print-color-adjust: exact;
+            }
+            /* Hilangkan menu kiri dan tombol saat dicetak */
+            .navbar, .form-panel {
+                display: none !important;
+            }
+            .container {
+                display: block;
+            }
+            .preview-panel {
+                padding: 0;
+                background-color: white;
+                display: block;
             }
             .a4-paper {
-                transform: scale(0.6);
-                transform-origin: top center;
-                margin-bottom: -40%;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 25mm 30mm !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                transform: none !important; /* Kembalikan ukuran asli di HP */
+            }
+            .highlight {
+                background-color: transparent !important;
             }
         }
     </style>
@@ -208,9 +231,9 @@
                 <input type="text" id="inputPT" placeholder="Contoh: PT Indofood CBP" onkeyup="updatePreview()">
             </div>
 
-            <button class="btn-download" onclick="downloadPDF()">Download PDF</button>
+            <button class="btn-download" onclick="downloadPDF()">Buat PDF Sekarang</button>
             
-            <p class="info-text">Isi formulir di atas, hasil (preview) di sebelah kanan akan berubah secara otomatis. Klik Download jika sudah sesuai.</p>
+            <p class="info-text"><b>Cara Unduh:</b> Setelah klik tombol di atas, akan muncul menu Print. Pilih <b>"Save as PDF / Simpan sebagai PDF"</b> lalu tekan Save.</p>
         </div>
 
         <!-- PREVIEW PANEL -->
@@ -263,7 +286,7 @@
     </div>
 
     <script>
-        // Auto set tanggal hari ini (Format Indonesia)
+        // Auto set tanggal hari ini otomatis
         window.onload = function() {
             const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const today = new Date();
@@ -284,34 +307,27 @@
             prevKota.innerText = kota ? kota : "Pasuruan, ............................";
             prevPT.innerText = pt ? pt : "[Nama Perusahaan Tujuan]";
             
-            // Remove highlight effect when user typing
-            prevKota.style.backgroundColor = "transparent";
-            prevPT.style.backgroundColor = "transparent";
+            // Hilangkan efek warna kuning jika sudah diketik
+            prevKota.style.backgroundColor = kota ? "transparent" : "#ffffcc";
+            prevPT.style.backgroundColor = pt ? "transparent" : "#ffffcc";
         }
 
+        // Fungsi Download PDF menggunakan sistem Native Print Browser
         function downloadPDF() {
-            const element = document.getElementById('surat-lamaran');
-            
-            // Get current company name for dynamic filename
+            // Ubah nama file otomatis sesuai nama PT
             let ptName = document.getElementById('inputPT').value;
-            let fileName = ptName ? 'Surat_Lamaran_Samsudin_' + ptName.replace(/ /g, '_') + '.pdf' : 'Surat_Lamaran_Samsudin.pdf';
-
-            // html2pdf options
-            const opt = {
-                margin:       0,
-                filename:     fileName,
-                image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 4, useCORS: true }, // Scale 4 for high resolution text
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Tambahkan sedikit efek loading di tombol
-            const btn = document.querySelector('.btn-download');
-            btn.innerText = "Memproses PDF...";
+            let finalName = ptName ? 'Surat_Lamaran_Samsudin_' + ptName.replace(/ /g, '_') : 'Surat_Lamaran_Samsudin';
             
-            html2pdf().set(opt).from(element).save().then(() => {
-                btn.innerText = "Download PDF";
-            });
+            // Simpan title website asli
+            let originalTitle = document.title;
+            // Ganti title sementara agar nama file PDF mengikuti nama ini
+            document.title = finalName;
+            
+            // Buka dialog Print (Save as PDF)
+            window.print();
+            
+            // Kembalikan title asli setelah jendela print ditutup
+            document.title = originalTitle;
         }
     </script>
 </body>
