@@ -1,190 +1,318 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta property="og:title" content="Undangan Susanto & Rose" />
-<meta property="og:description" content="Official Invitation Digital Susanto & Rose | By Rumah Digital." />
-<meta property="og:image" content="https://rumahdigitalproject.github.io/Susanto-Rose/halaman1.webp" />
-<meta property="og:url" content="https://rumahdigitalproject.github.io/Susanto-Rose/" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Undangan</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Generate Surat Lamaran | Samsudin Jefri</title>
+    <!-- Library html2pdf untuk mendownload PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a365d;
+            --bg-color: #f3f4f6;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .navbar {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .form-panel {
+            width: 350px;
+            background: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            overflow-y: auto;
+            z-index: 10;
+        }
+        .preview-panel {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            background-color: #525659;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus, input[type="date"]:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .btn-download {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        .btn-download:hover {
+            background-color: #218838;
+        }
+        .info-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 15px;
+            text-align: center;
+        }
 
-    html, body {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      font-family: sans-serif;
-      background-color: black;
-    }
+        /* A4 Paper Styles (Preview) */
+        .a4-paper {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 25mm 30mm;
+            box-sizing: border-box;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #2b2b2b;
+        }
+        /* Specific elements inside A4 */
+        .a4-paper .header {
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        .a4-paper h1 {
+            font-size: 20pt;
+            text-transform: uppercase;
+            margin: 0 0 5px 0;
+            color: var(--primary);
+            letter-spacing: 1.5px;
+        }
+        .a4-paper .contact-info {
+            font-size: 10pt;
+            color: #555555;
+        }
+        .a4-paper .contact-info span {
+            margin: 0 5px;
+            color: var(--primary);
+        }
+        .a4-paper .tanggal {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .a4-paper .penerima {
+            margin-bottom: 25px;
+        }
+        .a4-paper p {
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+        .a4-paper .lampiran-list {
+            margin-top: 5px;
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+        .a4-paper .lampiran-list li {
+            margin-bottom: 4px;
+        }
+        .a4-paper .ttd {
+            margin-top: 30px;
+            float: right;
+            text-align: center;
+            width: 250px;
+        }
+        .a4-paper .nama-ttd {
+            margin-top: 70px;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        
+        .highlight {
+            background-color: #ffffcc;
+            transition: background-color 0.3s;
+        }
 
-    body {
-      background: url('halaman1.webp') no-repeat center center;
-      background-size: cover;
-      animation: fadeIn 2.5s ease-in-out forwards;
-    }
-
-    .btn-buka {
-      position: absolute;
-      bottom: 120px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #ffffffcc; /* putih semi transparan */
-      color: #000;
-      padding: 12px 36px;
-      border-radius: 14px;
-      font-size: 18px;
-      font-weight: 600;
-      text-decoration: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      border: 1px solid #ddd;
-      transition: 0.3s ease;
-      animation: slideUp 1s ease-out 1.2s forwards, pulse 1.8s ease-in-out infinite 3s;
-      opacity: 0;
-    }
-
-    .btn-buka:hover {
-      background-color: #fff;
-      transform: translateX(-50%) scale(1.05);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-    }
-
-    /* ANIMASI */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        transform: translateX(-50%) scale(1);
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
-      }
-      50% {
-        transform: translateX(-50%) scale(1.08);
-        box-shadow: 0 0 22px rgba(255, 255, 255, 1);
-      }
-    }
-
-    @media (max-height: 700px) {
-      .btn-buka {
-        bottom: 20px;
-        padding: 12px 28px;
-        font-size: 16px;
-      }
-    }
-
-    /* Halaman video */
-    #video-page {
-      display: none;
-      height: 100%;
-      width: 100%;
-      background: #000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #video-page video {
-      height: 100vh;
-      width: auto;
-      object-fit: cover;
-    }
-
-    /* Halaman penutup */
-    #closing-page {
-      display: none;
-      height: 100vh;
-      width: 100%;
-      background: #fdfdfd;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-    }
-
-    #closing-page button {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: none;
-      background: #000;
-      color: #fff;
-      font-size: 24px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-
-    #closing-page p {
-      font-size: 14px;
-      color: #444;
-      margin-top: 10px;
-    }
-  </style>
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .form-panel {
+                width: 100%;
+                box-sizing: border-box;
+                border-bottom: 1px solid #ccc;
+            }
+            .a4-paper {
+                transform: scale(0.6);
+                transform-origin: top center;
+                margin-bottom: -40%;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Halaman pembuka -->
-  <div id="home-page">
-    <a href="#" class="btn-buka" onclick="openVideo()">Buka Undangan</a>
-  </div>
+    <div class="navbar">
+        Surat Lamaran Generator - Samsudin Jefri
+    </div>
 
-  <!-- Halaman video -->
-  <div id="video-page">
-    <video id="undanganVideo" autoplay playsinline>
-      <source src="https://raw.githubusercontent.com/rumahdigitalproject/Susanto-Rose/main/video.mp4" type="video/mp4">
-      Browser Anda tidak mendukung video.
-    </video>
-  </div>
+    <div class="container">
+        <!-- FORM PANEL -->
+        <div class="form-panel">
+            <h3>Isi Data Lamaran</h3>
+            
+            <div class="form-group">
+                <label for="inputKota">Kota & Tanggal Lamaran</label>
+                <input type="text" id="inputKota" placeholder="Contoh: Pasuruan, 20 Juli 2026" onkeyup="updatePreview()">
+            </div>
 
-  <!-- Halaman penutup -->
-  <div id="closing-page">
-    <button onclick="replayVideo()">↑</button>
-    <p>© 2025 Rumah Digital Project</p>
-  </div>
+            <div class="form-group">
+                <label for="inputPT">Nama Perusahaan Tujuan</label>
+                <input type="text" id="inputPT" placeholder="Contoh: PT Indofood CBP" onkeyup="updatePreview()">
+            </div>
 
-  <script>
-    function openVideo() {
-      document.getElementById('home-page').style.display = 'none';
-      document.getElementById('video-page').style.display = 'flex';
-      document.getElementById('closing-page').style.display = 'none';
+            <button class="btn-download" onclick="downloadPDF()">Download PDF</button>
+            
+            <p class="info-text">Isi formulir di atas, hasil (preview) di sebelah kanan akan berubah secara otomatis. Klik Download jika sudah sesuai.</p>
+        </div>
 
-      let vid = document.getElementById('undanganVideo');
-      vid.muted = false; // hidupkan audio
-      vid.play();
+        <!-- PREVIEW PANEL -->
+        <div class="preview-panel">
+            <div class="a4-paper" id="surat-lamaran">
+                <div class="header">
+                    <h1>Samsudin Rohmatul Jefri</h1>
+                    <div class="contact-info">
+                        Pasuruan, Jawa Timur <span>|</span> 0821-4342-2981 <span>|</span> samsudinjefri4@gmail.com
+                    </div>
+                </div>
+            
+                <div class="content">
+                    <div class="tanggal" id="preview-kota" class="highlight">Pasuruan, ............................</div>
+            
+                    <div class="penerima">
+                        Hal: <b>Lamaran Pekerjaan</b><br>
+                        Lampiran: 6 (Enam) Lembar / Berkas<br><br>
+                        Yth. HRD Manager<br>
+                        <b id="preview-pt" class="highlight">[Nama Perusahaan Tujuan]</b><br>
+                        di Tempat
+                    </div>
+            
+                    <p>Dengan hormat,</p>
+            
+                    <p>Melalui surat ini, saya bermaksud melamar posisi <b>Operator Produksi</b> di perusahaan yang Bapak/Ibu pimpin. Saya adalah lulusan Teknik Pengecoran Logam dari SMK Negeri 1 Grati dengan pengalaman kerja lebih dari 3 tahun di industri manufaktur (PT Yamaha Electronics Manufacturing dan PT Syngenta Seed Indonesia).</p>
+            
+                    <p>Selama bekerja, saya terbiasa mengoperasikan mesin produksi skala besar (seperti <i>Press, Glue Line,</i> dan <i>Conveyor</i>), melakukan <i>Quality Control</i> (QC) secara ketat menggunakan alat ukur presisi, serta menerapkan budaya 5R dan standar Keselamatan Kerja (K3) secara disiplin di bawah target harian dan sistem <i>shift</i>.</p>
+            
+                    <p>Sebagai bahan pertimbangan Bapak/Ibu, bersama surat ini turut saya lampirkan kelengkapan administrasi sebagai berikut:</p>
+                    
+                    <ol class="lampiran-list">
+                        <li>Curriculum Vitae (CV)</li>
+                        <li>Fotokopi Ijazah Terakhir</li>
+                        <li>Surat Keterangan Pengalaman Kerja (Paklaring)</li>
+                        <li>Fotokopi Surat Keterangan Catatan Kepolisian (SKCK)</li>
+                        <li>Fotokopi Kartu Tanda Penduduk (KTP)</li>
+                        <li>Pas Foto Terbaru</li>
+                    </ol>
+            
+                    <p>Saya sangat berharap dapat diberikan kesempatan wawancara untuk menjelaskan lebih detail kualifikasi yang saya miliki dan bagaimana saya bisa berkontribusi di perusahaan Bapak/Ibu. Atas perhatian dan waktu yang diberikan, saya ucapkan terima kasih.</p>
+            
+                    <div class="ttd">
+                        Hormat saya,<br>
+                        <div class="nama-ttd">Samsudin Rohmatul Jefri</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-      // kalau video selesai → tampilkan penutup
-      vid.onended = function() {
-        document.getElementById('video-page').style.display = 'none';
-        document.getElementById('closing-page').style.display = 'flex';
-        document.getElementById('closing-page').scrollIntoView({ behavior: 'smooth' });
-      };
-    }
+    <script>
+        // Auto set tanggal hari ini (Format Indonesia)
+        window.onload = function() {
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const today = new Date();
+            const dateString = "Pasuruan, " + today.getDate() + " " + months[today.getMonth()] + " " + today.getFullYear();
+            
+            document.getElementById('inputKota').value = dateString;
+            updatePreview();
+        };
 
-    function replayVideo() {
-      document.getElementById('closing-page').style.display = 'none';
-      document.getElementById('video-page').style.display = 'flex';
+        function updatePreview() {
+            let kota = document.getElementById('inputKota').value;
+            let pt = document.getElementById('inputPT').value;
+            
+            const prevKota = document.getElementById('preview-kota');
+            const prevPT = document.getElementById('preview-pt');
 
-      let vid = document.getElementById('undanganVideo');
-      vid.currentTime = 0; // mulai dari awal
-      vid.play();
-    }
-  </script>
+            // Update text
+            prevKota.innerText = kota ? kota : "Pasuruan, ............................";
+            prevPT.innerText = pt ? pt : "[Nama Perusahaan Tujuan]";
+            
+            // Remove highlight effect when user typing
+            prevKota.style.backgroundColor = "transparent";
+            prevPT.style.backgroundColor = "transparent";
+        }
 
+        function downloadPDF() {
+            const element = document.getElementById('surat-lamaran');
+            
+            // Get current company name for dynamic filename
+            let ptName = document.getElementById('inputPT').value;
+            let fileName = ptName ? 'Surat_Lamaran_Samsudin_' + ptName.replace(/ /g, '_') + '.pdf' : 'Surat_Lamaran_Samsudin.pdf';
+
+            // html2pdf options
+            const opt = {
+                margin:       0,
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 4, useCORS: true }, // Scale 4 for high resolution text
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Tambahkan sedikit efek loading di tombol
+            const btn = document.querySelector('.btn-download');
+            btn.innerText = "Memproses PDF...";
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerText = "Download PDF";
+            });
+        }
+    </script>
 </body>
 </html>
