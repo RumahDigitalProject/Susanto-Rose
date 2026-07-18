@@ -131,8 +131,13 @@
             <h3>Data Surat Lamaran</h3>
             
             <div class="form-group">
-                <label>Kota & Tanggal</label>
+                <label>Tempat & Tanggal Surat</label>
                 <input type="text" id="inputKota" placeholder="Contoh: Pasuruan, 18 Juli 2026" onkeyup="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>Posisi yang Dilamar</label>
+                <input type="text" id="inputPosisi" placeholder="Contoh: Operator Produksi" onkeyup="updatePreview()">
             </div>
 
             <div class="form-group">
@@ -153,8 +158,9 @@
                 <div class="right-align highlight" id="preview-kota">Pasuruan, ............................</div>
 
                 <div class="mb-3">
-                    <p class="no-margin">Hal: Lamaran Pekerjaan – Operator Produksi</p>
-                    <p class="no-margin">Lampiran: 6 (Enam) Berkas</p>
+                    <!-- Posisi Otomatis Berubah di Sini -->
+                    <p class="no-margin">Hal: Lamaran Pekerjaan – <span id="preview-posisi1" class="highlight">[Posisi yang Dilamar]</span></p>
+                    <p class="no-margin">Lampiran: 7 (Tujuh) Berkas</p>
                 </div>
 
                 <div class="mb-3">
@@ -164,7 +170,8 @@
 
                 <p><b>Dengan hormat,</b></p>
 
-                <p style="margin-bottom: 8px;">Berdasarkan informasi lowongan pekerjaan yang saya terima, melalui surat ini saya bermaksud melamar posisi <b>Operator Produksi di <span id="preview-pt2" class="highlight">[Nama Perusahaan]</span></b>. Berikut adalah data diri singkat saya:</p>
+                <!-- Posisi Otomatis Berubah di Sini -->
+                <p style="margin-bottom: 8px;">Berdasarkan informasi lowongan pekerjaan yang saya terima, melalui surat ini saya bermaksud melamar posisi <b><span id="preview-posisi2" class="highlight">[Posisi yang Dilamar]</span> di <span id="preview-pt2" class="highlight">[Nama Perusahaan]</span></b>. Berikut adalah data diri singkat saya:</p>
 
                 <table>
                     <tr><td class="col-1">Nama</td><td class="col-2">:</td><td>Samsudin Rohmatul Jefri</td></tr>
@@ -186,6 +193,7 @@
                     <li>Surat Keterangan Pengalaman Kerja (Paklaring)</li>
                     <li>Fotokopi SKCK</li>
                     <li>Pasfoto Terbaru</li>
+                    <li>Dokumen Pendukung Lainnya</li> <!-- Lampiran No 7 Ditambahkan -->
                 </ol>
 
                 <p>Besar harapan saya untuk dapat mengikuti tahapan wawancara agar saya bisa menjelaskan lebih detail mengenai kualifikasi saya. Atas waktu dan perhatian Bapak/Ibu, saya ucapkan terima kasih.</p>
@@ -213,18 +221,26 @@
         // Update teks
         function updatePreview() {
             let kota = document.getElementById('inputKota').value;
+            let posisi = document.getElementById('inputPosisi').value;
             let pt = document.getElementById('inputPT').value;
             
             const prevKota = document.getElementById('preview-kota');
+            const prevPosisi1 = document.getElementById('preview-posisi1');
+            const prevPosisi2 = document.getElementById('preview-posisi2');
             const prevPT = document.getElementById('preview-pt');
             const prevPT2 = document.getElementById('preview-pt2');
 
+            // Mengganti Teks
             prevKota.innerText = kota ? kota : "Pasuruan, ............................";
+            prevPosisi1.innerText = posisi ? posisi : "[Posisi yang Dilamar]";
+            prevPosisi2.innerText = posisi ? posisi : "[Posisi yang Dilamar]";
             prevPT.innerText = pt ? pt : "[Nama Perusahaan]";
             prevPT2.innerText = pt ? pt : "[Nama Perusahaan]";
 
-            // Warna peringatan kuning
+            // Warna peringatan kuning hilang jika sudah diisi
             prevKota.style.backgroundColor = kota ? "transparent" : "#ffffcc";
+            prevPosisi1.style.backgroundColor = posisi ? "transparent" : "#ffffcc";
+            prevPosisi2.style.backgroundColor = posisi ? "transparent" : "#ffffcc";
             prevPT.style.backgroundColor = pt ? "transparent" : "#ffffcc";
             prevPT2.style.backgroundColor = pt ? "transparent" : "#ffffcc";
         }
@@ -255,9 +271,10 @@
                     // 5. Ubah Canvas menjadi Data File PNG
                     const imgData = canvas.toDataURL('image/png');
 
-                    // 6. Nama File Otomatis
+                    // 6. Nama File Otomatis menyesuaikan Perusahaan & Posisi
                     let ptName = document.getElementById('inputPT').value || 'Perusahaan';
-                    let fileName = 'Surat_Lamaran_Samsudin_' + ptName.replace(/ /g, '_') + '.png';
+                    let posName = document.getElementById('inputPosisi').value || 'Posisi';
+                    let fileName = 'Surat_Lamaran_' + posName.replace(/ /g, '_') + '_' + ptName.replace(/ /g, '_') + '.png';
 
                     // 7. Proses Download Otomatis
                     const link = document.createElement('a');
