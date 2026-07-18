@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto-Generate Lamaran & CV | Samsudin Jefri</title>
+    <title>Surat Lamaran Generator | Samsudin Jefri</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <!-- Library Khusus Untuk Memotret HTML Menjadi Gambar (PNG) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         :root {
@@ -53,15 +53,11 @@
             background-color: #525659;
         }
         
+        /* --- Form Styles --- */
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 0.9rem; }
         input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; box-sizing: border-box; }
         input[type="text"]:focus { border-color: var(--primary); outline: none; }
-        
-        .radio-group { background: #f8f9fa; padding: 10px; border-radius: 5px; border: 1px solid #e9ecef; }
-        .radio-item { margin-bottom: 8px; display: flex; align-items: center; }
-        .radio-item input { margin-right: 8px; cursor: pointer; }
-        .radio-item label { margin-bottom: 0; font-weight: normal; cursor: pointer; }
 
         .btn-download {
             background-color: #28a745;
@@ -76,10 +72,11 @@
             transition: background 0.3s;
             margin-top: 10px;
         }
+        .btn-download:hover { background-color: #218838; }
         .btn-download:disabled { background-color: #6c757d; cursor: not-allowed; }
-        .info-text { font-size: 0.8rem; color: #666; margin-top: 15px; text-align: justify; }
+        .info-text { font-size: 0.8rem; color: #666; margin-top: 15px; text-align: justify; line-height: 1.4; }
 
-        /* KERTAS SURAT LAMARAN */
+        /* --- KERTAS SURAT LAMARAN (UKURAN A4 PATEN) --- */
         .a4-paper {
             width: 210mm;
             height: 297mm;
@@ -92,8 +89,11 @@
             line-height: 1.4;
             color: #000;
             text-align: justify;
+            /* Flex-shrink 0 agar tidak mengkerut di layar kecil */
+            flex-shrink: 0; 
         }
 
+        /* --- CSS Isi Surat --- */
         .right-align { text-align: right; margin-bottom: 20px; }
         .no-margin { margin: 0; }
         .mb-3 { margin-bottom: 15px; }
@@ -106,13 +106,14 @@
         li { margin-bottom: 2px; }
         .ttd { margin-top: 25px; }
         .nama-ttd { font-weight: bold; margin-top: 60px; }
+        
         .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px;}
 
-        /* Responsive HP */
+        /* --- Tampilan Skala di Layar HP --- */
         @media (max-width: 768px) {
             .container { flex-direction: column; }
             .form-panel { width: 100%; border-bottom: 1px solid #ccc; }
-            .a4-paper {
+            .mobile-scale {
                 transform: scale(0.5);
                 transform-origin: top center;
                 margin-bottom: -150%; 
@@ -122,12 +123,12 @@
 </head>
 <body>
 
-    <div class="navbar">Surat Lamaran Generator - Samsudin Jefri</div>
+    <div class="navbar">Surat Lamaran Generator - PNG Output</div>
 
     <div class="container">
         <!-- FORM PANEL KIRI -->
         <div class="form-panel">
-            <h3>Isi Data Lamaran</h3>
+            <h3>Data Surat Lamaran</h3>
             
             <div class="form-group">
                 <label>Kota & Tanggal</label>
@@ -139,28 +140,16 @@
                 <input type="text" id="inputPT" placeholder="Contoh: PT Indofood CBP" onkeyup="updatePreview()">
             </div>
 
-            <div class="form-group">
-                <label>Pilih File Lampiran PDF:</label>
-                <div class="radio-group">
-                    <div class="radio-item">
-                        <input type="radio" id="cv-ats" name="cvType" value="ats" checked>
-                        <label for="cv-ats">Gabung <b>lampiran_ats.pdf</b></label>
-                    </div>
-                    <div class="radio-item">
-                        <input type="radio" id="cv-biasa" name="cvType" value="biasa">
-                        <label for="cv-biasa">Gabung <b>lampiran_biasa.pdf</b></label>
-                    </div>
-                </div>
-            </div>
-
-            <button class="btn-download" id="btnDownload" onclick="generateAndMergePDF()">Unduh Berkas Lengkap (PDF)</button>
+            <button class="btn-download" id="btnDownload" onclick="downloadPNG()">Unduh Gambar (PNG)</button>
+            
+            <p class="info-text"><b>Fokus Kualitas:</b> Sistem ini khusus mengunduh Surat Lamaran dalam wujud <b>Foto/Gambar (PNG) Resolusi Tinggi</b>. Bebas error, dan hasilnya dijamin tajam saat Anda gabungkan mandiri menjadi PDF nanti.</p>
         </div>
 
         <!-- PREVIEW PANEL KANAN -->
         <div class="preview-panel">
             
-            <!-- HALAMAN 1: SURAT LAMARAN -->
-            <div class="a4-paper" id="hal-surat">
+            <!-- HALAMAN SURAT LAMARAN (WADAH UTAMA) -->
+            <div class="a4-paper mobile-scale" id="hal-surat">
                 <div class="right-align highlight" id="preview-kota">Pasuruan, ............................</div>
 
                 <div class="mb-3">
@@ -211,6 +200,7 @@
     </div>
 
     <script>
+        // Set tanggal otomatis saat dibuka
         window.onload = function() {
             const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const today = new Date();
@@ -220,6 +210,7 @@
             updatePreview();
         };
 
+        // Update teks
         function updatePreview() {
             let kota = document.getElementById('inputKota').value;
             let pt = document.getElementById('inputPT').value;
@@ -232,90 +223,60 @@
             prevPT.innerText = pt ? pt : "[Nama Perusahaan]";
             prevPT2.innerText = pt ? pt : "[Nama Perusahaan]";
 
+            // Warna peringatan kuning
             prevKota.style.backgroundColor = kota ? "transparent" : "#ffffcc";
             prevPT.style.backgroundColor = pt ? "transparent" : "#ffffcc";
             prevPT2.style.backgroundColor = pt ? "transparent" : "#ffffcc";
         }
 
-        async function generateAndMergePDF() {
+        // FUNGSI MENGUNDUH GAMBAR PNG HIGH RESOLUTION
+        async function downloadPNG() {
             const btn = document.getElementById('btnDownload');
-            btn.innerText = "Menggabungkan Dokumen...";
+            const surat = document.getElementById('hal-surat');
+
+            // 1. Ubah tombol dan matikan highlight kuning sementara
+            btn.innerText = "Memproses Gambar...";
             btn.disabled = true;
+            document.querySelectorAll('.highlight').forEach(el => el.style.backgroundColor = 'transparent');
 
-            const highlights = document.querySelectorAll('.highlight');
-            highlights.forEach(el => el.style.backgroundColor = 'transparent');
+            // 2. Matikan paksa skala (kembalikan ke ukuran raksasa A4 agar hasil foto tidak buram)
+            surat.classList.remove('mobile-scale');
 
-            try {
-                // TAHAP 1: DUPLIKASI SURAT UNTUK MENGHINDARI BUG LAYAR HP
-                const originalSurat = document.getElementById('hal-surat');
-                const clonedSurat = originalSurat.cloneNode(true);
-                
-                // Posisikan kloningan di luar layar dengan ukuran A4 asli agar terfoto 100% sempurna
-                clonedSurat.style.position = 'fixed';
-                clonedSurat.style.top = '0';
-                clonedSurat.style.left = '0';
-                clonedSurat.style.zIndex = '-9999';
-                clonedSurat.style.transform = 'none'; // Matikan pengecilan skala
-                document.body.appendChild(clonedSurat);
+            // 3. Jeda sedikit agar layar sempat merender ukuran aslinya
+            setTimeout(async () => {
+                try {
+                    // 4. Potret halaman menjadi Canvas (Skala 3 = Kualitas Sangat Tajam/HD)
+                    const canvas = await html2canvas(surat, {
+                        scale: 3, 
+                        useCORS: true,
+                        backgroundColor: '#ffffff'
+                    });
 
-                // Proses pembuatan PDF Surat Lamaran ke Blob ArrayBuffer
-                const opt = {
-                    margin: 0,
-                    image: { type: 'jpeg', quality: 1 },
-                    html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, 
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-                
-                const suratPdfBlob = await html2pdf().set(opt).from(clonedSurat).output('blob');
-                const suratPdfBytes = await suratPdfBlob.arrayBuffer();
-                
-                // Hapus surat kloningan setelah selesai difoto
-                document.body.removeChild(clonedSurat);
+                    // 5. Ubah Canvas menjadi Data File PNG
+                    const imgData = canvas.toDataURL('image/png');
 
-                // TAHAP 2: AMBIL PDF LAMPIRAN DARI GITHUB
-                let pilihanCV = document.querySelector('input[name="cvType"]:checked').value;
-                let namaFileLampiran = (pilihanCV === 'ats') ? 'lampiran_ats.pdf' : 'lampiran_biasa.pdf';
-                
-                const response = await fetch(namaFileLampiran);
-                if (!response.ok) {
-                    throw new Error("File PDF " + namaFileLampiran + " tidak ditemukan di GitHub!");
+                    // 6. Nama File Otomatis
+                    let ptName = document.getElementById('inputPT').value || 'Perusahaan';
+                    let fileName = 'Surat_Lamaran_Samsudin_' + ptName.replace(/ /g, '_') + '.png';
+
+                    // 7. Proses Download Otomatis
+                    const link = document.createElement('a');
+                    link.href = imgData;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                } catch (error) {
+                    alert("Gagal mengunduh gambar. Pastikan internet lancar.");
+                } finally {
+                    // 8. Kembalikan semua ke posisi semula
+                    surat.classList.add('mobile-scale');
+                    btn.innerText = "Unduh Gambar (PNG)";
+                    btn.disabled = false;
+                    updatePreview(); // Kembalikan warna kuning jika field kosong
                 }
-                const lampiranPdfBytes = await response.arrayBuffer();
-
-                // TAHAP 3: GABUNGKAN SURAT + LAMPIRAN
-                const { PDFDocument } = PDFLib;
-                const pdfFinal = await PDFDocument.load(suratPdfBytes);
-                const pdfLampiran = await PDFDocument.load(lampiranPdfBytes);
-                
-                const copiedPages = await pdfFinal.copyPages(pdfLampiran, pdfLampiran.getPageIndices());
-                copiedPages.forEach((page) => pdfFinal.addPage(page));
-
-                // TAHAP 4: DOWNLOAD OTOMATIS
-                const mergedPdfBytes = await pdfFinal.save();
-                const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
-                const url = URL.createObjectURL(blob);
-
-                let ptName = document.getElementById('inputPT').value;
-                let finalName = ptName ? 'Berkas_Lamaran_Samsudin_' + ptName.replace(/ /g, '_') + '.pdf' : 'Berkas_Lamaran_Samsudin.pdf';
-
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = finalName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                btn.innerText = "Unduh Berkas Lengkap (PDF)";
-                btn.disabled = false;
-                updatePreview(); 
-
-            } catch (error) {
-                alert("GAGAL: " + error.message);
-                btn.innerText = "Unduh Berkas Lengkap (PDF)";
-                btn.disabled = false;
-                updatePreview();
-            }
+            }, 100);
         }
     </script>
 </body>
