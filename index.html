@@ -75,13 +75,11 @@
             transition: background 0.3s;
             margin-top: 10px;
         }
-        .btn-download:hover { background-color: #218838; }
-        .info-text { font-size: 0.8rem; color: #666; margin-top: 15px; text-align: justify; }
 
-        /* --- Master Kertas A4 (Tampilan Web) --- */
+        /* --- Master Kertas A4 (Tampilan di Layar Web) --- */
         .a4-paper {
             width: 210mm;
-            height: 297mm; /* Dipatenkan ukurannya agar gambar tidak meluber */
+            min-height: 297mm;
             background: white;
             box-sizing: border-box;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
@@ -114,16 +112,19 @@
         /* --- HALAMAN 2+: CSS LAMPIRAN GAMBAR --- */
         .page-image {
             padding: 0 !important; 
-            display: none; /* Disembunyikan dulu, nanti dimunculkan JS */
+            /* Lampiran selalu dimunculkan secara default, TIDAK ADA display:none disini */
         }
         .page-image img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Ini kunci agar gambar tidak terpotong (fit ke A4) */
+            object-fit: contain; 
             display: block;
         }
+        
+        /* Class khusus untuk menyembunyikan CV yang tidak dipilih */
+        .hidden-cv { display: none !important; }
 
-        /* --- Responsive HP (Agar Preview di Layar HP Pas) --- */
+        /* --- Responsive Preview HP --- */
         @media (max-width: 768px) {
             .container { flex-direction: column; }
             .form-panel { width: 100%; border-bottom: 1px solid #ccc; }
@@ -135,68 +136,55 @@
         }
 
         /* =======================================================
-           PERBAIKAN MUTLAK PRINT PDF (KHUSUS HP ANDROID)
+           KODE SUPER KETAT UNTUK PRINT DI HP ANDROID
            ======================================================= */
         @media print {
-            @page { 
-                size: A4 portrait; 
-                margin: 0; /* Hilangkan margin kertas bawaan HP */
-            }
-            body, html { 
-                background-color: white; 
-                margin: 0; 
-                padding: 0;
-            }
+            @page { size: A4 portrait; margin: 0; }
+            body, html { background-color: white; margin: 0; padding: 0; width: 100%; }
             
-            /* Sembunyikan tombol dan menu saat di-print */
             .navbar, .form-panel { display: none !important; }
+            .container, .preview-panel { display: block !important; padding: 0 !important; margin: 0 !important; width: 100% !important; background: transparent !important; }
             
-            /* Lepaskan container dari flexbox agar halaman bisa berderet ke bawah */
-            .container, .preview-panel { 
-                display: block !important; 
-                padding: 0 !important; 
-                margin: 0 !important; 
-                width: 100% !important; 
-            }
-            
-            /* PENGATURAN KERTAS A4 SAAT DICETAK */
+            /* Kunci Utama: Memaksa Kertas Menjadi 1 Halaman Penuh tanpa Error Zoom */
             .a4-paper {
                 box-shadow: none !important;
                 margin: 0 !important;
+                border: none !important;
                 
-                /* PAKSA UKURAN FISIK KERTAS (Paten 1 Lembar) */
-                width: 210mm !important;
-                height: 297mm !important;
-                max-height: 297mm !important;
+                width: 100vw !important; /* Lebar paksa ikut layar print */
+                height: 100vh !important; /* Tinggi paksa persis 1 lembar kertas */
+                max-height: 100vh !important;
                 
-                transform: none !important; /* Matikan skala HP */
-                
-                page-break-after: always !important; /* Paksa turun ke halaman baru tiap ganti kertas */
+                transform: none !important; 
+                page-break-after: always !important; /* Turun halaman */
                 page-break-inside: avoid !important;
+                overflow: hidden !important;
             }
-            
-            /* Hapus page-break di kertas paling terakhir agar tidak ada halaman kosong */
             .a4-paper:last-child { page-break-after: auto !important; }
             
-            /* Kembalikan margin aman hanya untuk halaman teks surat */
-            .page-surat {
-                padding: 20mm 25mm !important;
-                box-sizing: border-box !important;
+            /* Margin Surat Lamaran */
+            .page-surat { padding: 2cm !important; box-sizing: border-box !important; }
+            
+            /* Paksa Gambar Lampiran (CV, KTP, dll) fit tanpa terpotong */
+            .page-image { 
+                padding: 0 !important; 
+                display: flex !important; /* Memusatkan gambar */
+                align-items: center !important;
+                justify-content: center !important;
             }
-            
-            /* Hilangkan highlight kuning di PDF */
-            .highlight { background-color: transparent !important; padding: 0; }
-            
-            /* PENGATURAN GAMBAR SAAT DICETAK (AGAR FULL & TIDAK TERPOTONG) */
-            .page-image { padding: 0 !important; }
             .page-image img {
-                width: 210mm !important;
-                height: 297mm !important;
-                object-fit: contain !important; /* Paksa gambar fit di dalam 210x297mm */
+                width: 100% !important;
+                height: 100vh !important; /* Paksa gambar tinggi 1 halaman */
+                object-fit: contain !important; /* Pastikan proporsional, dilarang terpotong */
                 display: block !important;
                 margin: 0 !important;
-                padding: 0 !important;
             }
+            
+            /* Tetap sembunyikan CV yang tidak dipilih saat di-print */
+            #hal-cv-ats.hidden-cv { display: none !important; }
+            #hal-cv-biasa.hidden-cv { display: none !important; }
+            
+            .highlight { background-color: transparent !important; padding: 0; }
         }
     </style>
 </head>
@@ -220,7 +208,7 @@
             </div>
 
             <div class="form-group">
-                <label>Pilih Jenis CV (Otomatis + Lampiran):</label>
+                <label>Pilih Jenis CV:</label>
                 <div class="radio-group">
                     <div class="radio-item">
                         <input type="radio" id="cv-ats" name="cvType" value="ats" checked onchange="updatePreview()">
@@ -234,8 +222,7 @@
             </div>
 
             <button class="btn-download" onclick="downloadPDF()">Buat PDF Sekarang</button>
-            
-            <p class="info-text"><b>Cara Unduh:</b> Klik tombol, lalu pilih <b>"Save as PDF"</b>. File akan otomatis tergabung lengkap: Surat Lamaran, CV, KTP, Ijazah, Paklaring, dan SKCK.</p>
+            <p class="info-text"><b>Pastikan Anda sudah meng-upload file "paklaring.jpg" ke GitHub agar tidak error.</b></p>
         </div>
 
         <!-- PREVIEW PANEL KANAN -->
@@ -294,11 +281,11 @@
                 <img src="ats.png" alt="CV ATS">
             </div>
             
-            <div class="a4-paper page-image" id="hal-cv-biasa">
+            <div class="a4-paper page-image hidden-cv" id="hal-cv-biasa">
                 <img src="biasa.png" alt="CV Biasa">
             </div>
 
-            <!-- HALAMAN 3-6: LAMPIRAN OTOMATIS -->
+            <!-- HALAMAN 3-6: LAMPIRAN (SELALU MUNCUL SECARA DEFAULT) -->
             <div class="a4-paper page-image lampiran-doc">
                 <img src="ijazah.jpg" alt="Ijazah">
             </div>
@@ -316,7 +303,6 @@
     </div>
 
     <script>
-        // Set tanggal otomatis saat web dibuka
         window.onload = function() {
             const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const today = new Date();
@@ -326,7 +312,6 @@
             updatePreview();
         };
 
-        // Fungsi mengupdate preview teks dan memunculkan halaman
         function updatePreview() {
             let kota = document.getElementById('inputKota').value;
             let pt = document.getElementById('inputPT').value;
@@ -343,29 +328,31 @@
             prevPT.style.backgroundColor = pt ? "transparent" : "#ffffcc";
             prevPT2.style.backgroundColor = pt ? "transparent" : "#ffffcc";
 
-            // Logika memunculkan CV sesuai pilihan
+            // LOGIKA SUPER AMAN: Hanya tambah/hapus class 'hidden-cv'
             let pilihanCV = document.querySelector('input[name="cvType"]:checked').value;
-            document.getElementById('hal-cv-ats').style.display = (pilihanCV === 'ats') ? 'block' : 'none';
-            document.getElementById('hal-cv-biasa').style.display = (pilihanCV === 'biasa') ? 'block' : 'none';
+            
+            const cvAts = document.getElementById('hal-cv-ats');
+            const cvBiasa = document.getElementById('hal-cv-biasa');
 
-            // Memaksa lampiran pendukung (Ijazah, KTP, dll) selalu muncul (block)
-            let lampiran = document.querySelectorAll('.lampiran-doc');
-            lampiran.forEach(doc => {
-                doc.style.display = 'block';
-            });
+            if(pilihanCV === 'ats') {
+                cvAts.classList.remove('hidden-cv');
+                cvBiasa.classList.add('hidden-cv');
+            } else {
+                cvAts.classList.add('hidden-cv');
+                cvBiasa.classList.remove('hidden-cv');
+            }
         }
 
-        // Fungsi memanggil fitur Print bawaan HP/Browser
         function downloadPDF() {
             let ptName = document.getElementById('inputPT').value;
             let finalName = ptName ? 'Berkas_Lamaran_Samsudin_' + ptName.replace(/ /g, '_') : 'Berkas_Lamaran_Samsudin';
             
             let originalTitle = document.title;
-            document.title = finalName; // Ganti title agar nama file PDF mengikuti
+            document.title = finalName;
             
-            window.print(); // Panggil menu "Save as PDF"
+            window.print();
             
-            document.title = originalTitle; // Kembalikan title web
+            document.title = originalTitle;
         }
     </script>
 </body>
