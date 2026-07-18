@@ -39,7 +39,7 @@
         .app-wrapper {
             display: flex;
             flex: 1;
-            flex-direction: row; /* Default Laptop: Kiri Kanan */
+            flex-direction: row; 
             overflow: hidden;
         }
         .form-panel {
@@ -50,13 +50,14 @@
             overflow-y: auto;
             z-index: 10;
         }
+        
         .preview-panel {
             flex: 1;
             padding: 40px 20px;
             overflow-y: auto;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            justify-content: center; /* Rata tengah horizontal */
+            align-items: flex-start; 
             background-color: #525659;
         }
         
@@ -79,6 +80,9 @@
             transition: 0.3s;
             margin-top: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         .btn-download:hover { background-color: #218838; transform: translateY(-2px); }
         .info-text { font-size: 0.85rem; color: #666; margin-top: 20px; text-align: justify; line-height: 1.5; padding: 10px; background: #e9ecef; border-radius: 8px; border-left: 4px solid var(--primary); }
@@ -97,6 +101,7 @@
             color: #000;
             text-align: justify;
             flex-shrink: 0; 
+            margin: 0 auto; /* Memaksa kertas ke tengah */
         }
 
         /* --- CSS ISI SURAT --- */
@@ -116,24 +121,25 @@
 
         /* --- SISTEM LOCK SCREEN (KADALUARSA) --- */
         #lockScreen {
-            display: none; /* Disembunyikan secara default */
+            display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(255, 255, 255, 0.95);
             z-index: 99999;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            justify-content: center; /* Vertikal Tengah */
+            align-items: center; /* Horizontal Tengah */
             text-align: center;
             padding: 20px;
             backdrop-filter: blur(5px);
+            box-sizing: border-box;
         }
-        .lock-box { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 400px; width: 100%; }
+        .lock-box { background: white; padding: 40px 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 400px; width: 100%; margin: auto; }
         .lock-box h2 { color: #dc3545; margin-top: 0; }
         .lock-box p { color: #555; line-height: 1.5; margin-bottom: 25px; }
-        .btn-wa { display: inline-block; background-color: var(--secondary); color: white; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; width: 100%; box-sizing: border-box; margin-bottom: 20px; font-size: 1.1rem; }
+        .btn-wa { display: block; background-color: var(--secondary); color: white; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; width: 100%; box-sizing: border-box; margin-bottom: 20px; font-size: 1.1rem; }
         .btn-wa:hover { background-color: #1ebe57; }
-        .kode-input { display: flex; gap: 10px; }
+        .kode-input { display: flex; gap: 10px; justify-content: center; }
         .kode-input input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; text-align: center; text-transform: uppercase; }
         .kode-input button { background-color: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
@@ -143,31 +149,49 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.7);
             z-index: 9999;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
+            justify-content: center; /* Vertikal Tengah */
+            align-items: center; /* Horizontal Tengah */
             padding: 20px;
+            box-sizing: border-box;
         }
         .modal-content {
-            background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 100%;
+            background: white; padding: 30px 20px; border-radius: 12px; max-width: 500px; width: 100%;
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             animation: slideDown 0.3s ease-out;
+            margin: auto;
+            text-align: center; /* Teks di dalam popup jadi rata tengah */
         }
         @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .modal-content h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
         .modal-content p { color: #444; line-height: 1.5; font-size: 0.95rem; }
-        .warning-box { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border-left: 5px solid #ffeeba; margin: 15px 0; font-weight: bold; font-size: 0.9rem; }
-        .app-list { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .warning-box { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border-left: 5px solid #ffeeba; margin: 15px 0; font-weight: bold; font-size: 0.9rem; text-align: left;}
+        .app-list { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left; }
         .app-list ul { margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9rem; color: #555; }
-        .btn-lanjut { background-color: var(--primary); color: white; border: none; padding: 14px; width: 100%; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        .btn-lanjut { background-color: var(--primary); color: white; border: none; padding: 14px; width: 100%; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; display: block; margin: 0 auto; }
 
-        /* --- RESPONSIVE LAYOUT (UNTUK HP) --- */
+        /* --- RESPONSIVE LAYOUT (KHUSUS TAMPILAN HP) --- */
         @media (max-width: 768px) {
             .app-wrapper { flex-direction: column; }
-            .form-panel { width: 100%; border-bottom: 1px solid #ddd; padding: 20px; }
-            .preview-panel { padding: 20px 10px; align-items: flex-start; }
+            
+            .form-panel { 
+                width: 100%; 
+                border-bottom: 1px solid #ddd; 
+                padding: 20px; 
+                text-align: center; /* Membuat judul dan tombol di HP rata tengah */
+            }
+            .form-group label { text-align: left; /* Khusus label input tetap di kiri agar enak dibaca */ }
+            
+            .preview-panel { 
+                padding: 20px 0; 
+                align-items: flex-start;
+                justify-content: center;
+                overflow-x: hidden;
+            }
             .a4-paper {
-                transform: scale(0.48); /* Sesuaikan layar HP */
-                transform-origin: top center;
+                transform: scale(0.46); /* Skala pas untuk layar HP */
+                transform-origin: top center; /* Memastikan titik zoom ada di tengah atas */
+                margin: 0 auto; /* Memastikan kertas benar-benar di tengah layar */
                 margin-bottom: -150%; 
             }
         }
@@ -179,7 +203,7 @@
     <div id="lockScreen">
         <div class="lock-box">
             <h2>Masa Aktif Habis</h2>
-            <p>Masa percobaan (trial) aplikasi 7 hari Anda telah berakhir. Untuk melanjutkan penggunaan aplikasi ini tanpa batas, silakan perpanjang aktivasi sebesar <b>Rp 10.000</b> untuk 7 hari ke depan.</p>
+            <p>Masa percobaan aplikasi 7 hari Anda telah berakhir. Untuk melanjutkan penggunaan tanpa batas, silakan perpanjang aktivasi sebesar <b>Rp 10.000</b> untuk 7 hari ke depan.</p>
             
             <a href="https://wa.me/6285706889273?text=Halo%20Admin,%20saya%20mau%20perpanjang%20akses%20Web%20Surat%20Lamaran%20(Rp10.000).%20Mohon%20info%20pembayarannya." class="btn-wa" target="_blank">
                 Hubungi Admin (WhatsApp)
@@ -219,7 +243,7 @@
                 </ul>
             </div>
 
-            <button class="btn-lanjut" id="btnProsesUnduh" onclick="eksekusiDownload()">Oke, Saya Paham & Unduh Sekarang</button>
+            <button class="btn-lanjut" id="btnProsesUnduh" onclick="eksekusiDownload()">Oke, Saya Paham & Unduh</button>
         </div>
     </div>
 
@@ -247,10 +271,10 @@
                     <input type="text" id="inputPT" placeholder="Contoh: PT Indofood CBP" onkeyup="updatePreview()">
                 </div>
 
-                <!-- Tombol ini memunculkan popup terlebih dahulu -->
+                <!-- Tombol memunculkan popup -->
                 <button class="btn-download" onclick="tampilkanPopup()">Unduh Gambar (PNG)</button>
                 
-                <p class="info-text"><b>Sistem Web Pro:</b> Khusus mencetak teks menjadi gambar resolusi tinggi tanpa membuat HP error/blank. Penggabungan lampiran dilakukan mandiri.</p>
+                <p class="info-text"><b>Sistem Web Pro:</b> Khusus mencetak teks menjadi gambar resolusi tinggi tanpa membuat HP error. Penggabungan lampiran dilakukan mandiri.</p>
             </div>
 
             <!-- PREVIEW PANEL KANAN -->
@@ -314,18 +338,15 @@
         // SISTEM LISENSI & KADALUARSA 7 HARI
         // ==========================================
         function cekLisensi() {
-            // Ambil waktu batas dari memori HP
             let expDate = localStorage.getItem('samsudin_exp');
             let now = new Date().getTime();
 
             if (!expDate) {
-                // Jika baru pertama kali buka, set waktu aktif 7 Hari (dalam milidetik)
                 let tujuhHari = 7 * 24 * 60 * 60 * 1000;
                 expDate = now + tujuhHari;
                 localStorage.setItem('samsudin_exp', expDate);
             }
 
-            // Jika waktu sekarang sudah melewati batas waktu
             if (now > parseInt(expDate)) {
                 document.getElementById('appUtama').style.display = 'none';
                 document.getElementById('lockScreen').style.display = 'flex';
@@ -335,21 +356,18 @@
         function prosesAktivasi() {
             let kode = document.getElementById('inputKode').value.toUpperCase();
             
-            // KODE RAHASIA ADMIN
             if (kode === 'JEFRI7HARI') {
                 let now = new Date().getTime();
                 let tujuhHari = 7 * 24 * 60 * 60 * 1000;
                 localStorage.setItem('samsudin_exp', now + tujuhHari);
                 alert("Aktivasi Berhasil! Aplikasi diperpanjang 7 hari.");
-                location.reload(); // Refresh halaman
+                location.reload(); 
             } else {
                 alert("Kode aktivasi salah atau tidak valid!");
             }
         }
 
-        // Jalankan cek lisensi saat web dimuat
         cekLisensi();
-
 
         // ==========================================
         // SISTEM PREVIEW TEKS SURAT
@@ -387,7 +405,6 @@
             prevPT2.style.backgroundColor = pt ? "transparent" : "#ffffcc";
         }
 
-
         // ==========================================
         // SISTEM POPUP & DOWNLOAD PNG
         // ==========================================
@@ -396,18 +413,15 @@
         }
 
         async function eksekusiDownload() {
-            // Tutup popup
             document.getElementById('tutorialModal').style.display = 'none';
             
             const btn = document.getElementById('btnProsesUnduh');
             const mainBtn = document.querySelector('.btn-download');
             const surat = document.getElementById('hal-surat');
 
-            // Matikan warna highlight sementara
             document.querySelectorAll('.highlight').forEach(el => el.style.backgroundColor = 'transparent');
             mainBtn.innerText = "Memproses Gambar...";
 
-            // Trik untuk HP: Hapus skala sementara dengan clone
             const clone = surat.cloneNode(true);
             clone.style.transform = 'none';
             clone.style.position = 'fixed';
@@ -418,7 +432,6 @@
 
             setTimeout(async () => {
                 try {
-                    // Eksekusi potret gambar (Scale 3 = Kualitas HD)
                     const canvas = await html2canvas(clone, {
                         scale: 3, 
                         useCORS: true,
@@ -431,7 +444,6 @@
                     let posName = document.getElementById('inputPosisi').value || 'Posisi';
                     let fileName = 'Surat_Lamaran_' + posName.replace(/ /g, '_') + '_' + ptName.replace(/ /g, '_') + '.png';
 
-                    // Eksekusi Download
                     const link = document.createElement('a');
                     link.href = imgData;
                     link.download = fileName;
@@ -444,7 +456,7 @@
                 } finally {
                     document.body.removeChild(clone);
                     mainBtn.innerText = "Unduh Gambar (PNG)";
-                    updatePreview(); // Kembalikan warna kuning jika kosong
+                    updatePreview(); 
                 }
             }, 100);
         }
