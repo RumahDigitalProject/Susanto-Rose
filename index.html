@@ -24,30 +24,30 @@
             flex-direction: column;
             min-height: 100vh;
         }
+        
+        /* --- NAVBAR & TIMER KECIL --- */
         .navbar {
             background-color: var(--primary);
             color: white;
             padding: 15px 20px;
             text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 20;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
         }
-        
-        /* --- TIMER HITUNG MUNDUR --- */
-        .timer-badge {
-            background-color: #ffc107;
-            color: #856404;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
+        .navbar-title {
+            font-size: 1.25rem;
             font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .navbar-timer {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #d1d5db; /* Warna abu-abu terang agar elegan */
+            margin-top: 4px;
+            letter-spacing: 0.5px;
         }
 
         /* --- LAYOUT UTAMA --- */
@@ -56,7 +56,7 @@
         .preview-panel { flex: 1; padding: 40px 20px; overflow-y: auto; display: flex; justify-content: center; align-items: flex-start; background-color: #525659; }
         
         /* --- FORM STYLES --- */
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark); font-size: 0.95rem; }
         input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; box-sizing: border-box; transition: 0.3s; }
         input[type="text"]:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 5px rgba(26, 54, 93, 0.3); }
@@ -80,18 +80,18 @@
         .nama-ttd { font-weight: bold; margin-top: 60px; }
         .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px; border-radius: 3px; }
 
-        /* --- LOCK SCREEN (KADALUARSA / AKTIVASI) --- */
+        /* --- LOCK SCREEN (KUNCI & MATI TOTAL) --- */
         #lockScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.95); z-index: 99999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; backdrop-filter: blur(5px); box-sizing: border-box; }
         .lock-box { background: white; padding: 40px 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 400px; width: 100%; margin: auto; }
-        .lock-box h2 { color: var(--danger); margin-top: 0; }
+        .lock-box h2 { color: var(--primary); margin-top: 0; }
         .lock-box p { color: #555; line-height: 1.5; margin-bottom: 25px; }
-        .btn-wa { display: block; background-color: var(--secondary); color: white; text-decoration: none; padding: 14px 20px; border-radius: 8px; font-weight: bold; width: 100%; box-sizing: border-box; font-size: 1.1rem; margin-bottom: 20px; }
+        .btn-wa { display: block; background-color: var(--secondary); color: white; text-decoration: none; padding: 14px 20px; border-radius: 8px; font-weight: bold; width: 100%; box-sizing: border-box; font-size: 1.1rem; margin-bottom: 15px; margin-top: 10px; }
         .btn-wa:hover { background-color: #1ebe57; }
-        .kode-input { display: flex; gap: 10px; justify-content: center; }
-        .kode-input input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; text-align: center; text-transform: uppercase; }
+        .kode-input { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+        .kode-input input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; text-align: center; }
         .kode-input button { background-color: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        #appUtama { display: none; }
+        #appUtama { display: none; flex-direction: column; height: 100vh; }
 
         /* --- POPUP EDUKASI DOWNLOAD --- */
         #tutorialModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
@@ -104,11 +104,10 @@
         .app-list ul { margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9rem; color: #555; }
         .btn-lanjut { background-color: var(--primary); color: white; border: none; padding: 14px; width: 100%; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; display: block; margin: 0 auto; }
 
-        /* --- RESPONSIVE HP --- */
+        /* --- RESPONSIVE HP (SEMUA DI TENGAH) --- */
         @media (max-width: 768px) {
             .app-wrapper { flex-direction: column; }
             .form-panel { width: 100%; border-bottom: 1px solid #ddd; padding: 20px; text-align: center; }
-            .form-group label { text-align: left; }
             .preview-panel { padding: 20px 0; align-items: flex-start; justify-content: center; overflow-x: hidden; }
             .a4-paper { transform: scale(0.46); transform-origin: top center; margin: 0 auto; margin-bottom: -150%; }
         }
@@ -116,21 +115,25 @@
 </head>
 <body>
 
-    <!-- LOCK SCREEN (MASA AKTIF HABIS / BELUM AKTIVASI) -->
+    <!-- LOCK SCREEN -->
     <div id="lockScreen">
         <div class="lock-box">
-            <h2 id="lockTitle">Aktivasi Diperlukan</h2>
-            <p id="lockDesc">Silakan masukkan kode aktivasi untuk menggunakan generator surat lamaran ini. Akses berlaku selama 7 Hari penuh.</p>
+            <h2 id="lockTitle">Aktivasi Web Diperlukan</h2>
+            <p id="lockDesc">Silakan masukkan kunci akses Anda. (Sistem akan ditutup otomatis pada 24 Juli Jam 12:00 Siang).</p>
             
-            <a href="https://wa.me/6285706889273?text=Halo%20Admin,%20saya%20mau%20beli%20kode%20aktivasi%20Web%20Surat%20Lamaran%20(Rp10.000).%20Mohon%20info%20pembayarannya." class="btn-wa" target="_blank">
-                Beli Kode (WhatsApp)
-            </a>
-
-            <div style="margin-bottom: 15px; font-size: 0.9rem; color: #666; font-weight: bold;">Masukkan Kode Aktivasi:</div>
-            <div class="kode-input">
-                <input type="text" id="inputKode" placeholder="Kode">
-                <button onclick="prosesAktivasi()">Klaim</button>
+            <!-- Area Pengisian Kunci -->
+            <div id="formAktivasi">
+                <div style="margin-bottom: 5px; font-size: 0.9rem; color: #666; font-weight: bold;">Masukkan Kunci:</div>
+                <div class="kode-input">
+                    <input type="text" id="inputKode" placeholder="Kunci Anda">
+                    <button onclick="prosesAktivasi()">Buka Web</button>
+                </div>
             </div>
+
+            <!-- Tombol WA (Bisa Disembunyikan/Dimunculkan via JS) -->
+            <a href="https://wa.me/6285706889273?text=Halo%20Admin,%20saya%20mau%20meminta%20kunci%20akses%20Web%20Surat%20Lamaran." id="btnWaAdmin" class="btn-wa" target="_blank" style="margin-top:20px;">
+                Hubungi Admin (WhatsApp)
+            </a>
         </div>
     </div>
 
@@ -164,12 +167,12 @@
         </div>
     </div>
 
-    <!-- APLIKASI UTAMA -->
+    <!-- APLIKASI UTAMA (MUNCUL JIKA KUNCI BENAR & WAKTU BELUM HABIS) -->
     <div id="appUtama">
         <div class="navbar">
-            Surat Lamaran Generator PRO
-            <!-- INI ADALAH HITUNG MUNDUR -->
-            <div class="timer-badge" id="countdownTimer">Sisa Waktu: Menghitung...</div>
+            <div class="navbar-title">Surat Lamaran Generator PRO</div>
+            <!-- WAKTU HITUNG MUNDUR (Kecil di Bawah Judul) -->
+            <div class="navbar-timer" id="countdownTimer">Menghitung Sisa Waktu...</div>
         </div>
 
         <div class="app-wrapper">
@@ -245,76 +248,90 @@
 
     <script>
         // ==========================================
-        // SISTEM KODE AKTIVASI & HITUNG MUNDUR (7 HARI)
+        // SISTEM KEAMANAN (KUNCI & KIAMAT WEB)
         // ==========================================
-        const kodeValid = ["JEFRI01", "JEFRI02", "JEFRI03", "JEFRI04", "PRO10K"];
+        
+        // Aturan Kunci Mutlak
+        const KUNCI_RAHASIA = "Jefri#SRT02973$20";
+        
+        // Aturan Batas Waktu Kiamat (Tgl 24 Juli 2026 Jam 12:00 Siang)
+        const BATAS_WAKTU_KIAMAT = new Date("2026-07-24T12:00:00").getTime();
 
-        function cekLisensiDanTimer() {
-            let expDate = localStorage.getItem('samsudin_exp');
-            let now = new Date().getTime();
+        function cekSistemUtama() {
+            let waktuSekarang = new Date().getTime();
+            let layarKunci = document.getElementById('lockScreen');
+            let layarUtama = document.getElementById('appUtama');
 
-            if (!expDate || now > parseInt(expDate)) {
-                // KONDISI: Belum aktivasi ATAU sudah lewat 7 hari
-                document.getElementById('appUtama').style.display = 'none';
-                document.getElementById('lockScreen').style.display = 'flex';
+            // 1. CEK APAKAH SUDAH KIAMAT (LEWAT TGL 24 JAM 12 SIANG)
+            if (waktuSekarang >= BATAS_WAKTU_KIAMAT) {
+                layarUtama.style.display = 'none';
+                layarKunci.style.display = 'flex';
                 
-                if (expDate && now > parseInt(expDate)) {
-                    document.getElementById('lockTitle').innerText = "Waktu Akses Habis";
-                    document.getElementById('lockDesc').innerText = "Masa aktif 7 hari telah berakhir. Silakan masukkan kode aktivasi baru atau beli akses perpanjangan (Rp 10.000).";
-                }
-            } else {
-                // KONDISI: Masih dalam masa aktif 7 Hari
-                document.getElementById('appUtama').style.display = 'flex';
-                document.getElementById('lockScreen').style.display = 'none';
-                
-                // Jalankan timer pengingat
-                jalankanHitungMundur(parseInt(expDate));
+                // Ubah Teks & Sembunyikan Kolom Kunci (Kunci tidak berlaku lagi)
+                document.getElementById('lockTitle').innerText = "Waktu Akses Berakhir";
+                document.getElementById('lockTitle').style.color = "var(--danger)";
+                document.getElementById('lockDesc').innerText = "Batas waktu penggunaan sistem (24 Juli Jam 12:00) telah habis. Web ini telah ditutup. Silakan hubungi Admin.";
+                document.getElementById('formAktivasi').style.display = 'none';
+                return; // Hentikan proses
             }
-        }
 
-        function prosesAktivasi() {
-            let kode = document.getElementById('inputKode').value.toUpperCase().trim();
+            // 2. JIKA BELUM KIAMAT, CEK APAKAH HP INI SUDAH MEMASUKKAN KUNCI
+            let statusAktif = localStorage.getItem('samsudin_active');
             
-            if (kodeValid.includes(kode)) {
-                let now = new Date().getTime();
-                let tujuhHari = 7 * 24 * 60 * 60 * 1000;
-                localStorage.setItem('samsudin_exp', now + tujuhHari);
-                
-                alert("Aktivasi Berhasil! Waktu 7 hari Anda dimulai sekarang.");
-                location.reload(); // Refresh untuk memunculkan web dan timer
+            if (statusAktif === 'yes') {
+                // Kunci sudah dimasukkan sebelumnya, langsung masuk ke web & jalankan timer
+                layarKunci.style.display = 'none';
+                layarUtama.style.display = 'flex';
+                jalankanTimerDiNavbar();
             } else {
-                alert("Kode aktivasi salah atau tidak terdaftar!");
+                // Pertama kali buka, minta kunci
+                layarUtama.style.display = 'none';
+                layarKunci.style.display = 'flex';
             }
         }
 
-        function jalankanHitungMundur(waktuBatas) {
+        // Fungsi saat tombol BUKA WEB diklik
+        function prosesAktivasi() {
+            let inputUser = document.getElementById('inputKode').value;
+            
+            if (inputUser === KUNCI_RAHASIA) {
+                // Simpan ingatan di HP klien bahwa dia sudah pegang kunci
+                localStorage.setItem('samsudin_active', 'yes');
+                alert("Kunci Diterima! Selamat menggunakan sistem.");
+                location.reload(); // Refresh untuk membuka web
+            } else {
+                alert("Kunci Akses Salah! Perhatikan huruf besar dan simbolnya.");
+            }
+        }
+
+        // Fungsi Hitung Mundur Kecil di Navbar
+        function jalankanTimerDiNavbar() {
             const elemenTimer = document.getElementById("countdownTimer");
             
             const hitungMundur = setInterval(function() {
                 const sekarang = new Date().getTime();
-                const selisih = waktuBatas - sekarang;
+                const selisih = BATAS_WAKTU_KIAMAT - sekarang;
 
                 if (selisih <= 0) {
                     clearInterval(hitungMundur);
-                    location.reload(); // Otomatis mengunci web saat waktu habis
+                    location.reload(); // Paksa refresh agar sistem terkunci kiamat
                 } else {
                     const hari = Math.floor(selisih / (1000 * 60 * 60 * 24));
                     const jam = Math.floor((selisih % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const menit = Math.floor((selisih % (1000 * 60 * 60)) / (1000 * 60));
-                    const detik = Math.floor((selisih % (1000 * 60)) / 1000);
-
-                    elemenTimer.innerHTML = `Sisa Akses: ${hari} Hari, ${jam} Jam, ${menit} Menit, ${detik} Detik`;
+                    
+                    // Format tulisan kecil di bawah judul
+                    elemenTimer.innerHTML = `Sisa Akses: ${hari} Hari, ${jam} Jam, ${menit} Menit`;
                     
                     if (hari < 1) {
-                        elemenTimer.style.backgroundColor = "#dc3545"; // Merah
-                        elemenTimer.style.color = "white";
+                        elemenTimer.style.color = "#fca5a5"; // Berubah merah muda jika sisa waktu kritis
                     }
                 }
             }, 1000);
         }
 
-        // Panggil fungsi segera saat web dibuka
-        cekLisensiDanTimer();
+        // Panggil sistem pengecekan mutlak saat web dimuat
+        cekSistemUtama();
 
         // ==========================================
         // SISTEM PREVIEW TEKS SURAT
