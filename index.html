@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auto-Generate Lamaran & CV | Samsudin Jefri</title>
-    <!-- Library Pembuat PDF Langsung (Bypass Print HP) -->
+    <!-- Library Pembuat PDF Langsung -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
@@ -50,7 +50,8 @@
             flex-direction: column;
             align-items: center;
             background-color: #525659;
-            gap: 20px;
+            /* Jarak antar kertas di layar */
+            gap: 20mm; 
         }
         
         /* --- Form Styles --- */
@@ -91,6 +92,7 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
             position: relative;
             overflow: hidden;
+            flex-shrink: 0; /* Mencegah kertas mengecil sendirinya */
         }
 
         /* --- HALAMAN 1: CSS SURAT LAMARAN --- */
@@ -114,19 +116,35 @@
         .page-surat li { margin-bottom: 2px; }
         .page-surat .ttd { margin-top: 25px; }
         .page-surat .nama-ttd { font-weight: bold; margin-top: 60px; }
-        
         .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px;}
 
-        /* --- HALAMAN GAMBAR (CV & LAMPIRAN) --- */
+        /* --- HALAMAN GAMBAR (CV, Ijazah, Paklaring, SKCK) --- */
         .page-image {
             padding: 0;
             display: none; /* Diatur via JS */
+            background-color: white;
         }
         .page-image img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Gambar presisi penuh kertas */
+            object-fit: contain; /* Gambar akan pas di A4, tidak terpotong */
             display: block;
+        }
+
+        /* --- HALAMAN KHUSUS KTP --- */
+        /* KTP tidak boleh 100%, kita buat ukurannya seperti fotokopi di tengah atas */
+        .page-ktp {
+            display: none; /* Diatur via JS */
+            background-color: white;
+            text-align: center;
+            padding-top: 40mm; /* Jarak dari atas kertas A4 */
+        }
+        .page-ktp img {
+            width: 100mm !important; /* Lebar KTP sekitar 10cm */
+            height: auto !important; /* Tingginya menyesuaikan proporsi asli */
+            object-fit: contain;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1); /* Kasih bayangan tipis seperti hasil scan */
+            margin: 0 auto;
         }
         
         /* Class penting: Jika ada class ini, halaman tidak akan dimasukkan ke PDF */
@@ -134,14 +152,16 @@
             display: none !important;
         }
 
-        /* --- Responsive HP --- */
+        /* --- Trik Responsive HP --- */
+        /* Class 'mobile-scale' akan dihapus sementara saat tombol download ditekan */
         @media (max-width: 768px) {
             .container { flex-direction: column; }
             .form-panel { width: 100%; border-bottom: 1px solid #ccc; }
-            #pdf-content {
-                transform: scale(0.5);
+            
+            .mobile-scale {
+                transform: scale(0.5); /* Mengecilkan tampilan di layar HP */
                 transform-origin: top center;
-                margin-bottom: -150%; 
+                margin-bottom: -350%; /* Ruang gulir layar HP */
             }
         }
     </style>
@@ -185,8 +205,8 @@
         <!-- PREVIEW PANEL KANAN -->
         <div class="preview-panel">
             
-            <!-- WADAH UTAMA UNTUK DI-DOWNLOAD JADI PDF -->
-            <div id="pdf-content">
+            <!-- WADAH UTAMA PDF (Diberi class mobile-scale untuk tampilan HP) -->
+            <div id="pdf-content" class="mobile-scale">
                 
                 <!-- HALAMAN 1: SURAT LAMARAN -->
                 <div class="a4-paper page-surat">
@@ -245,16 +265,22 @@
                     <img src="biasa.png" alt="CV Biasa">
                 </div>
 
-                <!-- HALAMAN 3-6: LAMPIRAN (PASTI MUNCUL) -->
+                <!-- HALAMAN 3: IJAZAH -->
                 <div class="a4-paper page-image lampiran-doc">
                     <img src="ijazah.jpg" alt="Ijazah">
                 </div>
-                <div class="a4-paper page-image lampiran-doc">
+                
+                <!-- HALAMAN 4: KTP (MENGGUNAKAN CLASS KHUSUS KTP) -->
+                <div class="a4-paper page-ktp lampiran-doc">
                     <img src="ktp.jpg" alt="KTP">
                 </div>
+                
+                <!-- HALAMAN 5: PAKLARING -->
                 <div class="a4-paper page-image lampiran-doc">
                     <img src="paklaring.jpg" alt="Paklaring">
                 </div>
+                
+                <!-- HALAMAN 6: SKCK -->
                 <div class="a4-paper page-image lampiran-doc">
                     <img src="skck.jpg" alt="SKCK">
                 </div>
@@ -311,53 +337,64 @@
             });
         }
 
-        // FUNGSI UTAMA: MENGUBAH HTML MENJADI PDF TANPA MENU PRINT HP
+        // FUNGSI UTAMA PDF
         function downloadPDF() {
             const btn = document.getElementById('btnDownload');
+            const pdfContainer = document.getElementById('pdf-content');
             
-            // Ubah tombol jadi status loading agar klien tahu sedang diproses
-            btn.innerText = "Membentuk PDF... (Tunggu Sekitar 5 Detik)";
+            // 1. Ubah tombol jadi status loading
+            btn.innerText = "Membentuk PDF... (Tunggu 5 Detik)";
             btn.disabled = true;
 
-            // Hilangkan warna kuning highlight sementara
+            // 2. Hilangkan warna kuning highlight sementara
             const highlights = document.querySelectorAll('.highlight');
             highlights.forEach(el => el.style.backgroundColor = 'transparent');
+
+            // 3. MATIKAN SKALA HP SEMENTARA (Kembalikan ke Ukuran 100% Asli A4)
+            pdfContainer.classList.remove('mobile-scale');
 
             // Set Nama File
             let ptName = document.getElementById('inputPT').value;
             let finalName = ptName ? 'Berkas_Lamaran_Samsudin_' + ptName.replace(/ /g, '_') + '.pdf' : 'Berkas_Lamaran_Samsudin.pdf';
 
-            // Ambil seluruh area yang mau dijadikan PDF
-            const element = document.getElementById('pdf-content');
+            // Beri waktu 0.1 Detik (100ms) agar layar HP merender ukuran A4 Raksasanya
+            setTimeout(() => {
+                // Aturan Konversi PDF
+                const opt = {
+                    margin:       0,
+                    filename:     finalName,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, scrollY: 0 }, // Scale 2 agar gambar tidak pecah
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
 
-            // Aturan Konversi PDF (Ini yang memaksa jadi 6 halaman)
-            const opt = {
-                margin:       0,
-                filename:     finalName,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true }, // Mengambil gambar dari GitHub
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Proses membuat PDF dan Download otomatis
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Kembalikan tombol seperti semula setelah selesai download
-                btn.innerText = "Unduh Berkas Lengkap (PDF)";
-                btn.disabled = false;
-                
-                // Kembalikan warna kuning jika field masih kosong
-                let kota = document.getElementById('inputKota').value;
-                let pt = document.getElementById('inputPT').value;
-                if(!kota) document.getElementById('preview-kota').style.backgroundColor = "#ffffcc";
-                if(!pt) {
-                    document.getElementById('preview-pt').style.backgroundColor = "#ffffcc";
-                    document.getElementById('preview-pt2').style.backgroundColor = "#ffffcc";
-                }
-            }).catch(err => {
-                alert("Gagal membuat PDF. Pastikan internet lancar.");
-                btn.innerText = "Unduh Berkas Lengkap (PDF)";
-                btn.disabled = false;
-            });
+                // Proses HTML2PDF
+                html2pdf().set(opt).from(pdfContainer).save().then(() => {
+                    // KEMBALIKAN KEADAAN SEPERTI SEMULA
+                    
+                    // a. Kembalikan ukuran layar HP (Kecilkan lagi)
+                    pdfContainer.classList.add('mobile-scale');
+                    
+                    // b. Kembalikan tombol
+                    btn.innerText = "Unduh Berkas Lengkap (PDF)";
+                    btn.disabled = false;
+                    
+                    // c. Kembalikan warna kuning jika kolom ada yang belum diisi
+                    let kota = document.getElementById('inputKota').value;
+                    let pt = document.getElementById('inputPT').value;
+                    if(!kota) document.getElementById('preview-kota').style.backgroundColor = "#ffffcc";
+                    if(!pt) {
+                        document.getElementById('preview-pt').style.backgroundColor = "#ffffcc";
+                        document.getElementById('preview-pt2').style.backgroundColor = "#ffffcc";
+                    }
+                }).catch(err => {
+                    // Jika gagal/error jaringan
+                    pdfContainer.classList.add('mobile-scale');
+                    alert("Gagal membuat PDF. Pastikan internet Anda lancar.");
+                    btn.innerText = "Unduh Berkas Lengkap (PDF)";
+                    btn.disabled = false;
+                });
+            }, 100); // 100 milidetik
         }
     </script>
 </body>
