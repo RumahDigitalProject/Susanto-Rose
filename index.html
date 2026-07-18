@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surat Lamaran Generator | Samsudin Jefri</title>
     
-    <!-- Library Khusus Untuk Memotret HTML Menjadi Gambar (PNG) -->
+    <!-- Library untuk Memotret Web ke Gambar PNG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         :root {
             --primary: #1a365d;
+            --secondary: #25d366; /* Warna WA */
             --bg-color: #f3f4f6;
+            --text-dark: #333;
         }
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -20,7 +22,7 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
         }
         .navbar {
             background-color: var(--primary);
@@ -30,70 +32,74 @@
             font-size: 1.2rem;
             font-weight: bold;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 20;
         }
-        .container {
+        
+        /* --- LAYOUT UTAMA (RESPONSIF LAPTOP & HP) --- */
+        .app-wrapper {
             display: flex;
             flex: 1;
+            flex-direction: row; /* Default Laptop: Kiri Kanan */
             overflow: hidden;
         }
         .form-panel {
             width: 350px;
             background: white;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            padding: 25px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
             overflow-y: auto;
             z-index: 10;
         }
         .preview-panel {
             flex: 1;
-            padding: 20px;
+            padding: 40px 20px;
             overflow-y: auto;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
             background-color: #525659;
         }
         
-        /* --- Form Styles --- */
+        /* --- FORM STYLES --- */
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 0.9rem; }
-        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; box-sizing: border-box; }
-        input[type="text"]:focus { border-color: var(--primary); outline: none; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark); font-size: 0.95rem; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; box-sizing: border-box; transition: 0.3s; }
+        input[type="text"]:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 5px rgba(26, 54, 93, 0.3); }
 
         .btn-download {
             background-color: #28a745;
             color: white;
             border: none;
-            padding: 12px;
+            padding: 14px;
             width: 100%;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 10px;
+            transition: 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .btn-download:hover { background-color: #218838; }
-        .btn-download:disabled { background-color: #6c757d; cursor: not-allowed; }
-        .info-text { font-size: 0.8rem; color: #666; margin-top: 15px; text-align: justify; line-height: 1.4; }
+        .btn-download:hover { background-color: #218838; transform: translateY(-2px); }
+        .info-text { font-size: 0.85rem; color: #666; margin-top: 20px; text-align: justify; line-height: 1.5; padding: 10px; background: #e9ecef; border-radius: 8px; border-left: 4px solid var(--primary); }
 
-        /* --- KERTAS SURAT LAMARAN (UKURAN A4 PATEN) --- */
+        /* --- KERTAS SURAT LAMARAN A4 --- */
         .a4-paper {
             width: 210mm;
             height: 297mm;
             background: white;
             box-sizing: border-box;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             padding: 20mm 25mm; 
             font-family: 'Arial', Helvetica, sans-serif;
             font-size: 11pt;
             line-height: 1.4;
             color: #000;
             text-align: justify;
-            /* Flex-shrink 0 agar tidak mengkerut di layar kecil */
             flex-shrink: 0; 
         }
 
-        /* --- CSS Isi Surat --- */
+        /* --- CSS ISI SURAT --- */
         .right-align { text-align: right; margin-bottom: 20px; }
         .no-margin { margin: 0; }
         .mb-3 { margin-bottom: 15px; }
@@ -106,15 +112,61 @@
         li { margin-bottom: 2px; }
         .ttd { margin-top: 25px; }
         .nama-ttd { font-weight: bold; margin-top: 60px; }
-        
-        .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px;}
+        .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px; border-radius: 3px; }
 
-        /* --- Tampilan Skala di Layar HP --- */
+        /* --- SISTEM LOCK SCREEN (KADALUARSA) --- */
+        #lockScreen {
+            display: none; /* Disembunyikan secara default */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            z-index: 99999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .lock-box { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 400px; width: 100%; }
+        .lock-box h2 { color: #dc3545; margin-top: 0; }
+        .lock-box p { color: #555; line-height: 1.5; margin-bottom: 25px; }
+        .btn-wa { display: inline-block; background-color: var(--secondary); color: white; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; width: 100%; box-sizing: border-box; margin-bottom: 20px; font-size: 1.1rem; }
+        .btn-wa:hover { background-color: #1ebe57; }
+        .kode-input { display: flex; gap: 10px; }
+        .kode-input input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; text-align: center; text-transform: uppercase; }
+        .kode-input button { background-color: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        /* --- SISTEM POPUP EDUKASI DOWNLOAD --- */
+        #tutorialModal {
+            display: none; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 100%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-content h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .modal-content p { color: #444; line-height: 1.5; font-size: 0.95rem; }
+        .warning-box { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border-left: 5px solid #ffeeba; margin: 15px 0; font-weight: bold; font-size: 0.9rem; }
+        .app-list { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .app-list ul { margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9rem; color: #555; }
+        .btn-lanjut { background-color: var(--primary); color: white; border: none; padding: 14px; width: 100%; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
+
+        /* --- RESPONSIVE LAYOUT (UNTUK HP) --- */
         @media (max-width: 768px) {
-            .container { flex-direction: column; }
-            .form-panel { width: 100%; border-bottom: 1px solid #ccc; }
-            .mobile-scale {
-                transform: scale(0.5);
+            .app-wrapper { flex-direction: column; }
+            .form-panel { width: 100%; border-bottom: 1px solid #ddd; padding: 20px; }
+            .preview-panel { padding: 20px 10px; align-items: flex-start; }
+            .a4-paper {
+                transform: scale(0.48); /* Sesuaikan layar HP */
                 transform-origin: top center;
                 margin-bottom: -150%; 
             }
@@ -123,92 +175,185 @@
 </head>
 <body>
 
-    <div class="navbar">Surat Lamaran Generator - PNG Output</div>
-
-    <div class="container">
-        <!-- FORM PANEL KIRI -->
-        <div class="form-panel">
-            <h3>Data Surat Lamaran</h3>
+    <!-- LOCK SCREEN (MASA AKTIF HABIS) -->
+    <div id="lockScreen">
+        <div class="lock-box">
+            <h2>Masa Aktif Habis</h2>
+            <p>Masa percobaan (trial) aplikasi 7 hari Anda telah berakhir. Untuk melanjutkan penggunaan aplikasi ini tanpa batas, silakan perpanjang aktivasi sebesar <b>Rp 10.000</b> untuk 7 hari ke depan.</p>
             
-            <div class="form-group">
-                <label>Tempat & Tanggal Surat</label>
-                <input type="text" id="inputKota" placeholder="Contoh: Pasuruan, 18 Juli 2026" onkeyup="updatePreview()">
-            </div>
+            <a href="https://wa.me/6285706889273?text=Halo%20Admin,%20saya%20mau%20perpanjang%20akses%20Web%20Surat%20Lamaran%20(Rp10.000).%20Mohon%20info%20pembayarannya." class="btn-wa" target="_blank">
+                Hubungi Admin (WhatsApp)
+            </a>
 
-            <div class="form-group">
-                <label>Posisi yang Dilamar</label>
-                <input type="text" id="inputPosisi" placeholder="Contoh: Operator Produksi" onkeyup="updatePreview()">
+            <div style="margin-bottom: 15px; font-size: 0.9rem; color: #666;">Sudah punya kode aktivasi?</div>
+            <div class="kode-input">
+                <input type="text" id="inputKode" placeholder="Masukkan Kode">
+                <button onclick="prosesAktivasi()">Aktivasi</button>
             </div>
-
-            <div class="form-group">
-                <label>Nama Perusahaan Tujuan</label>
-                <input type="text" id="inputPT" placeholder="Contoh: PT Indofood CBP" onkeyup="updatePreview()">
-            </div>
-
-            <button class="btn-download" id="btnDownload" onclick="downloadPNG()">Unduh Gambar (PNG)</button>
-            
-            <p class="info-text"><b>Fokus Kualitas:</b> Sistem ini khusus mengunduh Surat Lamaran dalam wujud <b>Foto/Gambar (PNG) Resolusi Tinggi</b>. Bebas error, dan hasilnya dijamin tajam saat Anda gabungkan mandiri menjadi PDF nanti.</p>
         </div>
+    </div>
 
-        <!-- PREVIEW PANEL KANAN -->
-        <div class="preview-panel">
+    <!-- POPUP EDUKASI DOWNLOAD -->
+    <div id="tutorialModal">
+        <div class="modal-content">
+            <h3>Cara Penggabungan File (PDF)</h3>
+            <p>Surat lamaran ini akan diunduh dalam format <b>Gambar (PNG) HD</b>. Anda perlu menggabungkannya dengan file dokumen lain menjadi PDF secara mandiri.</p>
             
-            <!-- HALAMAN SURAT LAMARAN (WADAH UTAMA) -->
-            <div class="a4-paper mobile-scale" id="hal-surat">
-                <div class="right-align highlight" id="preview-kota">Pasuruan, ............................</div>
-
-                <div class="mb-3">
-                    <!-- Posisi Otomatis Berubah di Sini -->
-                    <p class="no-margin">Hal: Lamaran Pekerjaan – <span id="preview-posisi1" class="highlight">[Posisi yang Dilamar]</span></p>
-                    <p class="no-margin">Lampiran: 7 (Tujuh) Berkas</p>
-                </div>
-
-                <div class="mb-3">
-                    <p class="no-margin"><b>Yth. Bapak/Ibu HRD <span id="preview-pt" class="highlight">[Nama Perusahaan]</span></b></p>
-                    <p class="no-margin"><b>Di Tempat</b></p>
-                </div>
-
-                <p><b>Dengan hormat,</b></p>
-
-                <!-- Posisi Otomatis Berubah di Sini -->
-                <p style="margin-bottom: 8px;">Berdasarkan informasi lowongan pekerjaan yang saya terima, melalui surat ini saya bermaksud melamar posisi <b><span id="preview-posisi2" class="highlight">[Posisi yang Dilamar]</span> di <span id="preview-pt2" class="highlight">[Nama Perusahaan]</span></b>. Berikut adalah data diri singkat saya:</p>
-
-                <table>
-                    <tr><td class="col-1">Nama</td><td class="col-2">:</td><td>Samsudin Rohmatul Jefri</td></tr>
-                    <tr><td class="col-1">Pendidikan</td><td class="col-2">:</td><td>SMK Negeri 1 Grati – Teknik Pengecoran Logam</td></tr>
-                    <tr><td class="col-1">Status Nikah</td><td class="col-2">:</td><td>Menikah</td></tr>
-                    <tr><td class="col-1">Alamat</td><td class="col-2">:</td><td>Dsn. Krajan RT 001/RW 008, Desa Plososari, Kec. Grati, Kab. Pasuruan, Jawa Timur</td></tr>
-                    <tr><td class="col-1">No. Telp</td><td class="col-2">:</td><td>0821 4342 2981</td></tr>
-                </table>
-
-                <p>Saya adalah individu yang disiplin, cekatan, dan memiliki ketahanan fisik prima untuk bekerja dengan target harian di lingkungan pabrik. Saya menaruh minat besar pada proses manufaktur, serta memiliki pemahaman yang kuat terkait standar Keselamatan dan Kesehatan Kerja (K3) dan penerapan budaya 5R di area kerja.</p>
-
-                <p>Sebagai informasi, saya memiliki pengalaman lebih dari 3 tahun di industri manufaktur (PT Yamaha Electronics Manufacturing Indonesia dan PT Syngenta Seed Indonesia). Pengalaman ini melatih saya untuk tangkas mengoperasikan mesin produksi skala besar (seperti mesin <i>Press, Glue Line</i>, dan <i>Conveyor</i>), serta cermat melakukan <i>Quality Control</i> (QC) presisi guna memastikan standar <i>zero defect</i>.</p>
-
-                <p style="margin-bottom: 0;">Sebagai bahan pertimbangan Bapak/Ibu, saya turut melampirkan:</p>
-                <ol>
-                    <li>Curriculum Vitae (CV)</li>
-                    <li>Fotokopi Ijazah</li>
-                    <li>Fotokopi KTP</li>
-                    <li>Surat Keterangan Pengalaman Kerja (Paklaring)</li>
-                    <li>Fotokopi SKCK</li>
-                    <li>Pasfoto Terbaru</li>
-                    <li>Dokumen Pendukung Lainnya</li> <!-- Lampiran No 7 Ditambahkan -->
-                </ol>
-
-                <p>Besar harapan saya untuk dapat mengikuti tahapan wawancara agar saya bisa menjelaskan lebih detail mengenai kualifikasi saya. Atas waktu dan perhatian Bapak/Ibu, saya ucapkan terima kasih.</p>
-
-                <div class="ttd">
-                    <p class="no-margin"><b>Hormat saya,</b></p>
-                    <p class="nama-ttd">Samsudin Rohmatul Jefri</p>
-                </div>
+            <div class="warning-box">
+                ⚠️ PERINGATAN KERAS!<br>
+                Saat menggabungkan file nanti, URUTAN DOKUMEN HARUS SESUAI dengan daftar lampiran:<br>
+                1. Surat Lamaran (Halaman 1)<br>
+                2. Curriculum Vitae (CV)<br>
+                3. Fotokopi Ijazah<br>
+                4. Fotokopi KTP<br>
+                5. Paklaring<br>
+                6. Fotokopi SKCK<br>
+                7. Dokumen Pendukung Lainnya
             </div>
 
+            <div class="app-list">
+                <b>Rekomendasi Alat Penggabung PDF (Gratis):</b>
+                <ul>
+                    <li><b>Lewat Website:</b> iLovePDF.com atau Smallpdf.com (Pilih menu JPG to PDF / Merge PDF).</li>
+                    <li><b>Lewat Aplikasi HP:</b> CamScanner, Image to PDF, atau WPS Office.</li>
+                </ul>
+            </div>
+
+            <button class="btn-lanjut" id="btnProsesUnduh" onclick="eksekusiDownload()">Oke, Saya Paham & Unduh Sekarang</button>
+        </div>
+    </div>
+
+    <!-- APLIKASI UTAMA -->
+    <div id="appUtama">
+        <div class="navbar">Surat Lamaran Generator PRO</div>
+
+        <div class="app-wrapper">
+            <!-- FORM PANEL KIRI -->
+            <div class="form-panel">
+                <h3>Data Surat Lamaran</h3>
+                
+                <div class="form-group">
+                    <label>Tempat & Tanggal Surat</label>
+                    <input type="text" id="inputKota" placeholder="Contoh: Pasuruan, 18 Juli 2026" onkeyup="updatePreview()">
+                </div>
+
+                <div class="form-group">
+                    <label>Posisi yang Dilamar</label>
+                    <input type="text" id="inputPosisi" placeholder="Contoh: Operator Produksi" onkeyup="updatePreview()">
+                </div>
+
+                <div class="form-group">
+                    <label>Nama Perusahaan Tujuan</label>
+                    <input type="text" id="inputPT" placeholder="Contoh: PT Indofood CBP" onkeyup="updatePreview()">
+                </div>
+
+                <!-- Tombol ini memunculkan popup terlebih dahulu -->
+                <button class="btn-download" onclick="tampilkanPopup()">Unduh Gambar (PNG)</button>
+                
+                <p class="info-text"><b>Sistem Web Pro:</b> Khusus mencetak teks menjadi gambar resolusi tinggi tanpa membuat HP error/blank. Penggabungan lampiran dilakukan mandiri.</p>
+            </div>
+
+            <!-- PREVIEW PANEL KANAN -->
+            <div class="preview-panel">
+                
+                <!-- HALAMAN SURAT LAMARAN -->
+                <div class="a4-paper" id="hal-surat">
+                    <div class="right-align highlight" id="preview-kota">Pasuruan, ............................</div>
+
+                    <div class="mb-3">
+                        <p class="no-margin">Hal: Lamaran Pekerjaan – <span id="preview-posisi1" class="highlight">[Posisi yang Dilamar]</span></p>
+                        <p class="no-margin">Lampiran: 7 (Tujuh) Berkas</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <p class="no-margin"><b>Yth. Bapak/Ibu HRD <span id="preview-pt" class="highlight">[Nama Perusahaan]</span></b></p>
+                        <p class="no-margin"><b>Di Tempat</b></p>
+                    </div>
+
+                    <p><b>Dengan hormat,</b></p>
+
+                    <p style="margin-bottom: 8px;">Berdasarkan informasi lowongan pekerjaan yang saya terima, melalui surat ini saya bermaksud melamar posisi <b><span id="preview-posisi2" class="highlight">[Posisi yang Dilamar]</span> di <span id="preview-pt2" class="highlight">[Nama Perusahaan]</span></b>. Berikut adalah data diri singkat saya:</p>
+
+                    <table>
+                        <tr><td class="col-1">Nama</td><td class="col-2">:</td><td>Samsudin Rohmatul Jefri</td></tr>
+                        <tr><td class="col-1">Pendidikan</td><td class="col-2">:</td><td>SMK Negeri 1 Grati – Teknik Pengecoran Logam</td></tr>
+                        <tr><td class="col-1">Status Nikah</td><td class="col-2">:</td><td>Menikah</td></tr>
+                        <tr><td class="col-1">Alamat</td><td class="col-2">:</td><td>Dsn. Krajan RT 001/RW 008, Desa Plososari, Kec. Grati, Kab. Pasuruan, Jawa Timur</td></tr>
+                        <tr><td class="col-1">No. Telp</td><td class="col-2">:</td><td>0821 4342 2981</td></tr>
+                    </table>
+
+                    <p>Saya adalah individu yang disiplin, cekatan, dan memiliki ketahanan fisik prima untuk bekerja dengan target harian di lingkungan pabrik. Saya menaruh minat besar pada proses manufaktur, serta memiliki pemahaman yang kuat terkait standar Keselamatan dan Kesehatan Kerja (K3) dan penerapan budaya 5R di area kerja.</p>
+
+                    <p>Sebagai informasi, saya memiliki pengalaman lebih dari 3 tahun di industri manufaktur (PT Yamaha Electronics Manufacturing Indonesia dan PT Syngenta Seed Indonesia). Pengalaman ini melatih saya untuk tangkas mengoperasikan mesin produksi skala besar (seperti mesin <i>Press, Glue Line</i>, dan <i>Conveyor</i>), serta cermat melakukan <i>Quality Control</i> (QC) presisi guna memastikan standar <i>zero defect</i>.</p>
+
+                    <p style="margin-bottom: 0;">Sebagai bahan pertimbangan Bapak/Ibu, saya turut melampirkan:</p>
+                    <ol>
+                        <li>Curriculum Vitae (CV)</li>
+                        <li>Fotokopi Ijazah</li>
+                        <li>Fotokopi KTP</li>
+                        <li>Surat Keterangan Pengalaman Kerja (Paklaring)</li>
+                        <li>Fotokopi SKCK</li>
+                        <li>Pasfoto Terbaru</li>
+                        <li>Dokumen Pendukung Lainnya</li>
+                    </ol>
+
+                    <p>Besar harapan saya untuk dapat mengikuti tahapan wawancara agar saya bisa menjelaskan lebih detail mengenai kualifikasi saya. Atas waktu dan perhatian Bapak/Ibu, saya ucapkan terima kasih.</p>
+
+                    <div class="ttd">
+                        <p class="no-margin"><b>Hormat saya,</b></p>
+                        <p class="nama-ttd">Samsudin Rohmatul Jefri</p>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 
     <script>
-        // Set tanggal otomatis saat dibuka
+        // ==========================================
+        // SISTEM LISENSI & KADALUARSA 7 HARI
+        // ==========================================
+        function cekLisensi() {
+            // Ambil waktu batas dari memori HP
+            let expDate = localStorage.getItem('samsudin_exp');
+            let now = new Date().getTime();
+
+            if (!expDate) {
+                // Jika baru pertama kali buka, set waktu aktif 7 Hari (dalam milidetik)
+                let tujuhHari = 7 * 24 * 60 * 60 * 1000;
+                expDate = now + tujuhHari;
+                localStorage.setItem('samsudin_exp', expDate);
+            }
+
+            // Jika waktu sekarang sudah melewati batas waktu
+            if (now > parseInt(expDate)) {
+                document.getElementById('appUtama').style.display = 'none';
+                document.getElementById('lockScreen').style.display = 'flex';
+            }
+        }
+
+        function prosesAktivasi() {
+            let kode = document.getElementById('inputKode').value.toUpperCase();
+            
+            // KODE RAHASIA ADMIN
+            if (kode === 'JEFRI7HARI') {
+                let now = new Date().getTime();
+                let tujuhHari = 7 * 24 * 60 * 60 * 1000;
+                localStorage.setItem('samsudin_exp', now + tujuhHari);
+                alert("Aktivasi Berhasil! Aplikasi diperpanjang 7 hari.");
+                location.reload(); // Refresh halaman
+            } else {
+                alert("Kode aktivasi salah atau tidak valid!");
+            }
+        }
+
+        // Jalankan cek lisensi saat web dimuat
+        cekLisensi();
+
+
+        // ==========================================
+        // SISTEM PREVIEW TEKS SURAT
+        // ==========================================
         window.onload = function() {
             const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const today = new Date();
@@ -218,7 +363,6 @@
             updatePreview();
         };
 
-        // Update teks
         function updatePreview() {
             let kota = document.getElementById('inputKota').value;
             let posisi = document.getElementById('inputPosisi').value;
@@ -230,14 +374,12 @@
             const prevPT = document.getElementById('preview-pt');
             const prevPT2 = document.getElementById('preview-pt2');
 
-            // Mengganti Teks
             prevKota.innerText = kota ? kota : "Pasuruan, ............................";
             prevPosisi1.innerText = posisi ? posisi : "[Posisi yang Dilamar]";
             prevPosisi2.innerText = posisi ? posisi : "[Posisi yang Dilamar]";
             prevPT.innerText = pt ? pt : "[Nama Perusahaan]";
             prevPT2.innerText = pt ? pt : "[Nama Perusahaan]";
 
-            // Warna peringatan kuning hilang jika sudah diisi
             prevKota.style.backgroundColor = kota ? "transparent" : "#ffffcc";
             prevPosisi1.style.backgroundColor = posisi ? "transparent" : "#ffffcc";
             prevPosisi2.style.backgroundColor = posisi ? "transparent" : "#ffffcc";
@@ -245,38 +387,51 @@
             prevPT2.style.backgroundColor = pt ? "transparent" : "#ffffcc";
         }
 
-        // FUNGSI MENGUNDUH GAMBAR PNG HIGH RESOLUTION
-        async function downloadPNG() {
-            const btn = document.getElementById('btnDownload');
+
+        // ==========================================
+        // SISTEM POPUP & DOWNLOAD PNG
+        // ==========================================
+        function tampilkanPopup() {
+            document.getElementById('tutorialModal').style.display = 'flex';
+        }
+
+        async function eksekusiDownload() {
+            // Tutup popup
+            document.getElementById('tutorialModal').style.display = 'none';
+            
+            const btn = document.getElementById('btnProsesUnduh');
+            const mainBtn = document.querySelector('.btn-download');
             const surat = document.getElementById('hal-surat');
 
-            // 1. Ubah tombol dan matikan highlight kuning sementara
-            btn.innerText = "Memproses Gambar...";
-            btn.disabled = true;
+            // Matikan warna highlight sementara
             document.querySelectorAll('.highlight').forEach(el => el.style.backgroundColor = 'transparent');
+            mainBtn.innerText = "Memproses Gambar...";
 
-            // 2. Matikan paksa skala (kembalikan ke ukuran raksasa A4 agar hasil foto tidak buram)
-            surat.classList.remove('mobile-scale');
+            // Trik untuk HP: Hapus skala sementara dengan clone
+            const clone = surat.cloneNode(true);
+            clone.style.transform = 'none';
+            clone.style.position = 'fixed';
+            clone.style.top = '0';
+            clone.style.left = '0';
+            clone.style.zIndex = '-9999';
+            document.body.appendChild(clone);
 
-            // 3. Jeda sedikit agar layar sempat merender ukuran aslinya
             setTimeout(async () => {
                 try {
-                    // 4. Potret halaman menjadi Canvas (Skala 3 = Kualitas Sangat Tajam/HD)
-                    const canvas = await html2canvas(surat, {
+                    // Eksekusi potret gambar (Scale 3 = Kualitas HD)
+                    const canvas = await html2canvas(clone, {
                         scale: 3, 
                         useCORS: true,
                         backgroundColor: '#ffffff'
                     });
 
-                    // 5. Ubah Canvas menjadi Data File PNG
                     const imgData = canvas.toDataURL('image/png');
 
-                    // 6. Nama File Otomatis menyesuaikan Perusahaan & Posisi
                     let ptName = document.getElementById('inputPT').value || 'Perusahaan';
                     let posName = document.getElementById('inputPosisi').value || 'Posisi';
                     let fileName = 'Surat_Lamaran_' + posName.replace(/ /g, '_') + '_' + ptName.replace(/ /g, '_') + '.png';
 
-                    // 7. Proses Download Otomatis
+                    // Eksekusi Download
                     const link = document.createElement('a');
                     link.href = imgData;
                     link.download = fileName;
@@ -285,13 +440,11 @@
                     document.body.removeChild(link);
 
                 } catch (error) {
-                    alert("Gagal mengunduh gambar. Pastikan internet lancar.");
+                    alert("Gagal mengunduh gambar. Pastikan browser Anda mendukung fitur ini.");
                 } finally {
-                    // 8. Kembalikan semua ke posisi semula
-                    surat.classList.add('mobile-scale');
-                    btn.innerText = "Unduh Gambar (PNG)";
-                    btn.disabled = false;
-                    updatePreview(); // Kembalikan warna kuning jika field kosong
+                    document.body.removeChild(clone);
+                    mainBtn.innerText = "Unduh Gambar (PNG)";
+                    updatePreview(); // Kembalikan warna kuning jika kosong
                 }
             }, 100);
         }
