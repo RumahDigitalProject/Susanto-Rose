@@ -35,7 +35,7 @@
             z-index: 20;
         }
         
-        /* --- LAYOUT UTAMA (RESPONSIF LAPTOP & HP) --- */
+        /* --- LAYOUT UTAMA --- */
         .app-wrapper {
             display: flex;
             flex: 1;
@@ -56,7 +56,7 @@
             padding: 40px 20px;
             overflow-y: auto;
             display: flex;
-            justify-content: center; /* Rata tengah horizontal */
+            justify-content: center;
             align-items: flex-start; 
             background-color: #525659;
         }
@@ -101,7 +101,7 @@
             color: #000;
             text-align: justify;
             flex-shrink: 0; 
-            margin: 0 auto; /* Memaksa kertas ke tengah */
+            margin: 0 auto; 
         }
 
         /* --- CSS ISI SURAT --- */
@@ -119,23 +119,23 @@
         .nama-ttd { font-weight: bold; margin-top: 60px; }
         .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px; border-radius: 3px; }
 
-        /* --- SISTEM LOCK SCREEN (KADALUARSA) --- */
+        /* --- SISTEM LOCK SCREEN (AKTIVASI & KADALUARSA) --- */
         #lockScreen {
-            display: none;
+            display: flex; /* Langsung tampil saat pertama dibuka */
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(255, 255, 255, 0.95);
             z-index: 99999;
             flex-direction: column;
-            justify-content: center; /* Vertikal Tengah */
-            align-items: center; /* Horizontal Tengah */
+            justify-content: center; 
+            align-items: center; 
             text-align: center;
             padding: 20px;
             backdrop-filter: blur(5px);
             box-sizing: border-box;
         }
         .lock-box { background: white; padding: 40px 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 400px; width: 100%; margin: auto; }
-        .lock-box h2 { color: #dc3545; margin-top: 0; }
+        .lock-box h2 { color: var(--primary); margin-top: 0; }
         .lock-box p { color: #555; line-height: 1.5; margin-bottom: 25px; }
         .btn-wa { display: block; background-color: var(--secondary); color: white; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; width: 100%; box-sizing: border-box; margin-bottom: 20px; font-size: 1.1rem; }
         .btn-wa:hover { background-color: #1ebe57; }
@@ -143,6 +143,9 @@
         .kode-input input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; text-align: center; text-transform: uppercase; }
         .kode-input button { background-color: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
+        /* Aplikasi disembunyikan sampai kode dimasukkan */
+        #appUtama { display: none; }
+
         /* --- SISTEM POPUP EDUKASI DOWNLOAD --- */
         #tutorialModal {
             display: none; 
@@ -150,8 +153,8 @@
             background: rgba(0, 0, 0, 0.7);
             z-index: 9999;
             flex-direction: column;
-            justify-content: center; /* Vertikal Tengah */
-            align-items: center; /* Horizontal Tengah */
+            justify-content: center; 
+            align-items: center; 
             padding: 20px;
             box-sizing: border-box;
         }
@@ -160,7 +163,7 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             animation: slideDown 0.3s ease-out;
             margin: auto;
-            text-align: center; /* Teks di dalam popup jadi rata tengah */
+            text-align: center; 
         }
         @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .modal-content h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
@@ -170,28 +173,20 @@
         .app-list ul { margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9rem; color: #555; }
         .btn-lanjut { background-color: var(--primary); color: white; border: none; padding: 14px; width: 100%; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; display: block; margin: 0 auto; }
 
-        /* --- RESPONSIVE LAYOUT (KHUSUS TAMPILAN HP) --- */
+        /* --- RESPONSIVE LAYOUT (KHUSUS HP) --- */
         @media (max-width: 768px) {
             .app-wrapper { flex-direction: column; }
-            
             .form-panel { 
-                width: 100%; 
-                border-bottom: 1px solid #ddd; 
-                padding: 20px; 
-                text-align: center; /* Membuat judul dan tombol di HP rata tengah */
+                width: 100%; border-bottom: 1px solid #ddd; padding: 20px; text-align: center; 
             }
-            .form-group label { text-align: left; /* Khusus label input tetap di kiri agar enak dibaca */ }
-            
+            .form-group label { text-align: left; }
             .preview-panel { 
-                padding: 20px 0; 
-                align-items: flex-start;
-                justify-content: center;
-                overflow-x: hidden;
+                padding: 20px 0; align-items: flex-start; justify-content: center; overflow-x: hidden;
             }
             .a4-paper {
-                transform: scale(0.46); /* Skala pas untuk layar HP */
-                transform-origin: top center; /* Memastikan titik zoom ada di tengah atas */
-                margin: 0 auto; /* Memastikan kertas benar-benar di tengah layar */
+                transform: scale(0.46); 
+                transform-origin: top center; 
+                margin: 0 auto; 
                 margin-bottom: -150%; 
             }
         }
@@ -199,17 +194,17 @@
 </head>
 <body>
 
-    <!-- LOCK SCREEN (MASA AKTIF HABIS) -->
+    <!-- LOCK SCREEN (PERTAMA KALI BUKA & KADALUARSA) -->
     <div id="lockScreen">
         <div class="lock-box">
-            <h2>Masa Aktif Habis</h2>
-            <p>Masa percobaan aplikasi 7 hari Anda telah berakhir. Untuk melanjutkan penggunaan tanpa batas, silakan perpanjang aktivasi sebesar <b>Rp 10.000</b> untuk 7 hari ke depan.</p>
+            <h2 id="lockTitle">Aktivasi Diperlukan</h2>
+            <p id="lockDesc">Silakan masukkan kode aktivasi untuk menggunakan generator surat lamaran ini. Jika belum memiliki kode, silakan beli akses (Rp 10.000 / 7 Hari).</p>
             
-            <a href="https://wa.me/6285706889273?text=Halo%20Admin,%20saya%20mau%20perpanjang%20akses%20Web%20Surat%20Lamaran%20(Rp10.000).%20Mohon%20info%20pembayarannya." class="btn-wa" target="_blank">
-                Hubungi Admin (WhatsApp)
+            <a href="https://wa.me/6285706889273?text=Halo%20Admin,%20saya%20mau%20beli%20kode%20aktivasi%20Web%20Surat%20Lamaran%20(Rp10.000).%20Mohon%20info%20pembayarannya." class="btn-wa" target="_blank">
+                Beli Kode (WhatsApp)
             </a>
 
-            <div style="margin-bottom: 15px; font-size: 0.9rem; color: #666;">Sudah punya kode aktivasi?</div>
+            <div style="margin-bottom: 15px; font-size: 0.9rem; color: #666; font-weight: bold;">Sudah punya kode aktivasi?</div>
             <div class="kode-input">
                 <input type="text" id="inputKode" placeholder="Masukkan Kode">
                 <button onclick="prosesAktivasi()">Aktivasi</button>
@@ -247,7 +242,7 @@
         </div>
     </div>
 
-    <!-- APLIKASI UTAMA -->
+    <!-- APLIKASI UTAMA (MUNCUL SETELAH AKTIVASI) -->
     <div id="appUtama">
         <div class="navbar">Surat Lamaran Generator PRO</div>
 
@@ -335,38 +330,52 @@
 
     <script>
         // ==========================================
-        // SISTEM LISENSI & KADALUARSA 7 HARI
+        // SISTEM LISENSI (KODE AKTIVASI & KADALUARSA)
         // ==========================================
+        // Daftar 5 Kode yang bisa Anda berikan ke klien
+        const kodeValid = ["JEFRI01", "JEFRI02", "JEFRI03", "JEFRI04", "PRO10K"];
+
         function cekLisensi() {
             let expDate = localStorage.getItem('samsudin_exp');
             let now = new Date().getTime();
 
             if (!expDate) {
-                let tujuhHari = 7 * 24 * 60 * 60 * 1000;
-                expDate = now + tujuhHari;
-                localStorage.setItem('samsudin_exp', expDate);
-            }
-
-            if (now > parseInt(expDate)) {
+                // Belum Pernah Aktivasi
                 document.getElementById('appUtama').style.display = 'none';
                 document.getElementById('lockScreen').style.display = 'flex';
+                document.getElementById('lockTitle').innerText = "Aktivasi Diperlukan";
+                document.getElementById('lockDesc').innerText = "Silakan masukkan kode aktivasi untuk menggunakan generator surat lamaran ini. Jika belum memiliki kode, silakan beli akses (Rp 10.000 / 7 Hari).";
+                document.getElementById('lockTitle').style.color = 'var(--primary)';
+            } else if (now > parseInt(expDate)) {
+                // Sudah Aktivasi Tapi Kadaluarsa (> 7 Hari)
+                document.getElementById('appUtama').style.display = 'none';
+                document.getElementById('lockScreen').style.display = 'flex';
+                document.getElementById('lockTitle').innerText = "Masa Aktif Habis";
+                document.getElementById('lockDesc').innerText = "Masa aktif 7 hari Anda telah berakhir. Untuk melanjutkan penggunaan, silakan beli kode aktivasi baru seharga Rp 10.000.";
+                document.getElementById('lockTitle').style.color = '#dc3545'; // Warna Merah
+            } else {
+                // Sedang Dalam Masa Aktif (Aman dibuka kapan saja)
+                document.getElementById('appUtama').style.display = 'block';
+                document.getElementById('lockScreen').style.display = 'none';
             }
         }
 
         function prosesAktivasi() {
             let kode = document.getElementById('inputKode').value.toUpperCase();
             
-            if (kode === 'JEFRI7HARI') {
+            // Cek apakah kode yang dimasukkan ada di dalam daftar kode valid
+            if (kodeValid.includes(kode)) {
                 let now = new Date().getTime();
                 let tujuhHari = 7 * 24 * 60 * 60 * 1000;
                 localStorage.setItem('samsudin_exp', now + tujuhHari);
-                alert("Aktivasi Berhasil! Aplikasi diperpanjang 7 hari.");
-                location.reload(); 
+                alert("Aktivasi Berhasil! Anda memiliki akses penuh selama 7 hari.");
+                location.reload(); // Refresh halaman untuk membuka aplikasi
             } else {
-                alert("Kode aktivasi salah atau tidak valid!");
+                alert("Kode aktivasi salah atau tidak terdaftar!");
             }
         }
 
+        // Panggil fungsi cek lisensi seketika saat web dimuat
         cekLisensi();
 
         // ==========================================
