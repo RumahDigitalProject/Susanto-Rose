@@ -3,182 +3,377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surat Lamaran Generator | Samsudin Jefri</title>
-    
+    <title>Surat Lamaran Generator | Portal Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <style>
-        :root {
-            --primary: #1a365d;
-            --secondary: #25d366; 
-            --danger: #dc3545;
-            --bg-color: #f3f4f6;
-            --text-dark: #333;
+        :root { 
+            --primary: #0f172a; 
+            --accent: #00f0ff; 
+            --secondary: #10b981; 
+            --danger: #ef4444; 
+            --bg-color: #f1f5f9; 
+            --text-dark: #1e293b; 
         }
-        body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-color); 
+            margin: 0; padding: 0; 
+            display: flex; flex-direction: column; 
+            min-height: 100vh; color: var(--text-dark);
         }
         
-        /* --- NAVBAR & TIMER KECIL --- */
-        .navbar {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px 20px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        /* ======================================================= */
+        /* --- PANEL KHUSUS ATAS (NAVBAR) --- */
+        /* ======================================================= */
+        .navbar { 
+            background: linear-gradient(135deg, #0f172a, #1e293b); 
+            color: white; padding: 12px 15px; text-align: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            position: relative; z-index: 20; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            border-bottom: 3px solid var(--secondary);
         }
-        .navbar-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-        .navbar-timer {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #d1d5db; /* Warna abu-abu terang agar elegan */
-            margin-top: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        /* --- LAYOUT UTAMA --- */
-        .app-wrapper { display: flex; flex: 1; flex-direction: row; overflow: hidden; }
-        .form-panel { width: 350px; background: white; padding: 25px; box-shadow: 2px 0 10px rgba(0,0,0,0.05); overflow-y: auto; z-index: 10; }
-        .preview-panel { flex: 1; padding: 40px 20px; overflow-y: auto; display: flex; justify-content: center; align-items: flex-start; background-color: #525659; }
+        .navbar-title { font-size: 1rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; text-shadow: 0 2px 5px rgba(0,0,0,0.5);}
+        .navbar-timer { font-size: 0.75rem; font-weight: 600; color: #00f0ff; margin-top: 4px; background: rgba(0,0,0,0.3); padding: 3px 10px; border-radius: 20px;}
         
-        /* --- FORM STYLES --- */
-        .form-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark); font-size: 0.95rem; }
-        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; box-sizing: border-box; transition: 0.3s; }
-        input[type="text"]:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 5px rgba(26, 54, 93, 0.3); }
-        .btn-download { background-color: #28a745; color: white; border: none; padding: 14px; width: 100%; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s; margin-top: 15px; display: block; margin-left: auto; margin-right: auto; }
-        .btn-download:hover { background-color: #218838; transform: translateY(-2px); }
-        .info-text { font-size: 0.85rem; color: #666; margin-top: 20px; text-align: justify; line-height: 1.5; padding: 10px; background: #e9ecef; border-radius: 8px; border-left: 4px solid var(--primary); }
+        /* GERIGI ADMIN DI DALAM NAVBAR */
+        .btn-admin-nav {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            font-size: 18px; cursor: pointer; transition: 0.3s;
+            background: rgba(255,255,255,0.15); border-radius: 50%;
+            width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-admin-nav:hover { transform: translateY(-50%) rotate(90deg); background: var(--secondary); }
 
-        /* --- KERTAS SURAT --- */
-        .a4-paper { width: 210mm; height: 297mm; background: white; box-sizing: border-box; box-shadow: 0 10px 20px rgba(0,0,0,0.3); padding: 20mm 25mm; font-family: 'Arial', Helvetica, sans-serif; font-size: 11pt; line-height: 1.4; color: #000; text-align: justify; flex-shrink: 0; margin: 0 auto; }
-        .right-align { text-align: right; margin-bottom: 20px; }
-        .no-margin { margin: 0; }
-        .mb-3 { margin-bottom: 15px; }
-        p { margin-top: 0; margin-bottom: 12px; }
-        table { border-collapse: collapse; margin-left: 20px; margin-bottom: 15px; width: 100%; }
-        td { padding: 1px 5px 1px 0; vertical-align: top; }
-        .col-1 { width: 105px; }
-        .col-2 { width: 10px; }
-        ol { margin-top: 5px; margin-bottom: 15px; padding-left: 40px; }
-        li { margin-bottom: 2px; }
-        .ttd { margin-top: 25px; }
-        .nama-ttd { font-weight: bold; margin-top: 60px; }
-        .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px; border-radius: 3px; }
-
-        /* --- LOCK SCREEN (KUNCI & MATI TOTAL) --- */
-        #lockScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.95); z-index: 99999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; backdrop-filter: blur(5px); box-sizing: border-box; }
-        .lock-box { background: white; padding: 40px 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-width: 400px; width: 100%; margin: auto; }
-        .lock-box h2 { color: var(--primary); margin-top: 0; }
-        .lock-box p { color: #555; line-height: 1.5; margin-bottom: 25px; }
-        .btn-wa { display: block; background-color: var(--secondary); color: white; text-decoration: none; padding: 14px 20px; border-radius: 8px; font-weight: bold; width: 100%; box-sizing: border-box; font-size: 1.1rem; margin-bottom: 15px; margin-top: 10px; }
-        .btn-wa:hover { background-color: #1ebe57; }
-        .kode-input { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .kode-input input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; text-align: center; }
-        .kode-input button { background-color: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        /* ======================================================= */
+        /* --- LAYOUT UTAMA KHUSUS HP (SEMUA CENTER) --- */
+        /* ======================================================= */
+        .app-wrapper { display: flex; flex: 1; flex-direction: column; overflow-y: auto; align-items: center; padding: 20px 15px;}
+        .form-panel { 
+            width: 100%; max-width: 420px; background: #ffffff; 
+            padding: 25px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+            border-radius: 16px; text-align: center;
+        }
         
+        .form-group { margin-bottom: 18px; text-align: center; }
+        label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--text-dark); font-size: 0.95rem; }
+        
+        input[type="text"], input[type="password"], input[type="file"], input[type="number"], textarea { 
+            width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; 
+            font-size: 1rem; box-sizing: border-box; transition: 0.3s; 
+            text-align: center; font-weight: 600; color: var(--primary);
+            background: #fff; font-family: inherit;
+        }
+        textarea { text-align: left; min-height: 80px; resize: vertical; }
+        input:focus, textarea:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+        
+        /* KONSISTENSI PLACEHOLDER KECIL, MIRING, TRANSPARAN UNTUK SEMUA INPUT */
+        input::placeholder, textarea::placeholder { 
+            font-size: 0.82rem !important; 
+            font-style: italic !important; 
+            color: rgba(100, 116, 139, 0.6) !important; 
+            font-weight: normal !important; 
+        }
+
+        .btn-download { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 15px; width: 100%; font-size: 1.05rem; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);}
+        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5); }
+        .btn-koreksi { background: linear-gradient(135deg, #3b82f6, #2563eb); margin-top: 15px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);}
+        .btn-koreksi:hover { box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); }
+
+        /* ======================================================= */
+        /* --- BERANDA / LOCK SCREEN + ANIMASI MATRIX HACKER --- */
+        /* ======================================================= */
+        #lockScreen { 
+            display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #050811; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; overflow: hidden;
+        }
+        
+        /* KANVAS SEKARANG ADA DI DALAM LOCKSCREEN AGAR TIDAK TERTUTUP */
+        #matrixCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        
+        .btn-rahasia-lock { 
+            position: absolute; top: 15px; right: 15px; 
+            font-size: 20px; cursor: pointer; z-index: 10; transition: 0.3s; 
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px);
+            color: #fff; border-radius: 50%; width: 42px; height: 42px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-rahasia-lock:hover { transform: scale(1.1) rotate(90deg); background: var(--accent); }
+
+        .lock-box { 
+            position: relative; z-index: 5; /* Kotak Form harus di atas Canvas */
+            background: rgba(255, 255, 255, 0.12); 
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            padding: 35px 25px; border-radius: 16px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
+            max-width: 360px; width: 100%; text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+        .lock-box h2 { color: #fff; margin-top: 0; font-size: 1.8rem; font-weight: 800; text-shadow: 0 2px 10px rgba(0,240,255,0.4); margin-bottom: 8px;}
+        .lock-box p { color: #e2e8f0; font-size: 0.9rem; margin-bottom: 25px; line-height: 1.4;}
+        .kode-input { display: flex; flex-direction: column; gap: 12px; }
+        .kode-input input { background: rgba(255, 255, 255, 0.9); border: none; color: #0f172a; padding: 15px; letter-spacing: 1px; font-size: 1.1rem;}
+        .kode-input button { 
+            background: linear-gradient(135deg, #00f0ff, #2563eb); color: #0f172a; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 1rem; text-transform: uppercase; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,240,255,0.3);
+        }
+        
+        .expired-box { display: none; margin-top: 15px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); padding: 15px; border-radius: 10px; text-align: left; color: #1e293b;}
+        .btn-wa-renew { display: block; background-color: var(--secondary); color: white; text-decoration: none; padding: 10px; border-radius: 8px; font-weight: bold; text-align: center; margin-top: 10px; font-size: 0.85rem;}
+
         #appUtama { display: none; flex-direction: column; height: 100vh; }
 
-        /* --- POPUP EDUKASI DOWNLOAD --- */
-        #tutorialModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal-content { background: white; padding: 30px 20px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 15px 35px rgba(0,0,0,0.2); animation: slideDown 0.3s ease-out; margin: auto; text-align: center; }
-        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-content h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
-        .modal-content p { color: #444; line-height: 1.5; font-size: 0.95rem; }
-        .warning-box { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border-left: 5px solid #ffeeba; margin: 15px 0; font-weight: bold; font-size: 0.9rem; text-align: left;}
-        .app-list { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left; }
-        .app-list ul { margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9rem; color: #555; }
-        .btn-lanjut { background-color: var(--primary); color: white; border: none; padding: 14px; width: 100%; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; display: block; margin: 0 auto; }
-
-        /* --- RESPONSIVE HP (SEMUA DI TENGAH) --- */
-        @media (max-width: 768px) {
-            .app-wrapper { flex-direction: column; }
-            .form-panel { width: 100%; border-bottom: 1px solid #ddd; padding: 20px; text-align: center; }
-            .preview-panel { padding: 20px 0; align-items: flex-start; justify-content: center; overflow-x: hidden; }
-            .a4-paper { transform: scale(0.46); transform-origin: top center; margin: 0 auto; margin-bottom: -150%; }
+        /* ======================================================= */
+        /* --- SEMUA POPUP / MODAL (KACA PUTIH TRANSPARAN BLUR) --- */
+        /* ======================================================= */
+        .admin-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); z-index: 100000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; overflow-y:auto; }
+        
+        .admin-box { 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 25px 20px; border-radius: 16px; max-width: 420px; width: 100%; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); text-align: center; margin:auto;
+            border: 1px solid rgba(255, 255, 255, 0.6); color: #0f172a;
         }
+        .admin-box h3 { color: var(--primary); margin-top: 0; font-size: 1.3rem; font-weight: 800;}
+        .admin-box label { color: #1e293b; font-size: 0.85rem; font-weight: 600; display:block; text-align:left; margin-bottom:5px;}
+        
+        .btn-admin { background-color: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem;}
+        .btn-danger { background-color: var(--danger); color: white;} 
+        .btn-edit { background-color: #f59e0b; color: white; }
+        .btn-toggle-on { background-color: var(--secondary); color: white; }
+        .btn-toggle-off { background-color: #64748b; color: white; }
+        
+        .admin-section { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.8); margin-bottom: 15px; text-align: left;}
+        
+        /* AREA SCROLL KHUSUS FORM ADMIN AGAR TIDAK KEPANJANGAN */
+        .admin-form-scroll { max-height: 50vh; overflow-y: auto; padding-right: 5px; margin-bottom: 10px; }
+        .admin-form-scroll input, .admin-form-scroll textarea { margin-bottom: 12px; font-size:0.9rem;}
+        
+        .hasil-key { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 8px; margin-top: 10px; display: none; border: 1px solid #34d399; position: relative; text-align: center;}
+        .hasil-key span { display: block; font-size: 1.4rem; font-weight: bold; color: var(--danger); margin: 6px 0; letter-spacing: 1px;}
+        .btn-copy { background: var(--secondary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; position: absolute; right: 10px; top: 10px; font-weight: bold;}
+        
+        .client-list { max-height: 220px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; margin-top: 10px; background: rgba(255,255,255,0.7); }
+        .client-item { padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;}
+        .action-btns { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;}
+        .action-btns button { padding: 5px 8px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem;}
+        
+        #loadingBar { display: none; color: #1e3a8a; background: #dbeafe; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight: bold; font-size: 0.85rem; text-align: center; border: 1px solid #bfdbfe;}
+        .cv-link-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+
+        /* ======================================================= */
+        /* --- KERTAS SURAT & POP-UP KOREKSI (BESAR & BISA ZOOM) --- */
+        /* ======================================================= */
+        #popupKoreksi .admin-box { max-width: 95%; height: 90vh; display: flex; flex-direction: column; padding: 15px; }
+        #kertasContainer { flex: 1; background: #cbd5e1; border-radius: 8px; overflow: auto; position: relative; margin-bottom: 15px; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
+        #kertasSpacer { width: calc(210mm * 0.48); height: calc(297mm * 0.48); transition: all 0.3s ease; }
+
+        .a4-paper { 
+            width: 210mm; height: 297mm; background: white; box-sizing: border-box;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); padding: 20mm 25mm; font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.4; color: #000; text-align: justify; 
+            position: absolute; top: 10px; left: 10px; transform-origin: top left;
+            transform: scale(0.45); transition: transform 0.3s ease; cursor: zoom-in;
+        }
+        .a4-paper.zoomed { transform: scale(0.85); cursor: zoom-out; }
+
+        .right-align { text-align: right; margin-bottom: 20px; }
+        .mb-3 { margin-bottom: 15px; } p { margin-top: 0; margin-bottom: 12px; }
+        table { border-collapse: collapse; margin-left: 20px; margin-bottom: 15px; width: 100%; }
+        td { padding: 1px 5px 1px 0; vertical-align: top; } .col-1 { width: 105px; } .col-2 { width: 10px; }
+        .ttd { margin-top: 25px; } .nama-ttd { font-weight: bold; margin-top: 60px; }
+        .highlight { background-color: #ffffcc; transition: 0.3s; padding: 0 3px; border-radius: 3px; }
+
+        /* ======================================================= */
+        /* --- POPUP EDUKASI PENGUNDUHAN --- */
+        /* ======================================================= */
+        #tutorialModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); z-index: 100000; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .modal-content { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); padding: 30px 20px; border-radius: 16px; max-width: 500px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.3); text-align: center; margin: auto; border: 1px solid rgba(255, 255, 255, 0.6); color: #0f172a;}
+        .modal-content h3 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 10px; font-weight: 800; font-size: 1.3rem;}
+        .warning-box { background: #fef3c7; color: #b45309; padding: 15px; border-radius: 10px; border-left: 5px solid #fbbf24; margin: 15px 0; font-weight: bold; font-size: 0.9rem; text-align: left;}
+        .app-list { background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: left; border: 1px solid rgba(255,255,255,0.8);}
+        .app-list ul { margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9rem; color: #334155; }
     </style>
 </head>
 <body>
 
-    <!-- LOCK SCREEN -->
+    <!-- ============================================== -->
+    <!-- LOCK SCREEN KLIEN (BERANDA AWAL) -->
+    <!-- ============================================== -->
     <div id="lockScreen">
+        <!-- KANVAS ANIMASI MATRIX / HACKER -->
+        <canvas id="matrixCanvas"></canvas>
+
+        <!-- TOMBOL ADMIN DI LOCK SCREEN -->
+        <div class="btn-rahasia-lock" id="btnAdminLock" onclick="bukaPopupLoginAdmin()" title="Admin Panel">⚙️</div>
+
+        <!-- BOX LOGIN -->
         <div class="lock-box">
-            <h2 id="lockTitle">Aktivasi Web Diperlukan</h2>
-            <p id="lockDesc">Silakan masukkan kunci akses Anda. (Sistem akan ditutup otomatis pada 24 Juli Jam 12:00 Siang).</p>
+            <h2>PORTAL PRO</h2>
+            <p>Masukkan kunci aktivasi rahasia Anda untuk mengakses generator otomatis.</p>
             
-            <!-- Area Pengisian Kunci -->
-            <div id="formAktivasi">
-                <div style="margin-bottom: 5px; font-size: 0.9rem; color: #666; font-weight: bold;">Masukkan Kunci:</div>
-                <div class="kode-input">
-                    <input type="text" id="inputKode" placeholder="Kunci Anda">
-                    <button onclick="prosesAktivasi()">Buka Web</button>
+            <div class="kode-input">
+                <input type="text" id="inputKode" placeholder="Contoh: JEF-1234" autocomplete="off">
+                <button onclick="prosesAktivasiKlien()">Buka Akses Sistem</button>
+            </div>
+
+            <!-- BOX EXPIRED / NONAKTIF -->
+            <div class="expired-box" id="expiredNotification">
+                <b style="color: #b45309; display:block; margin-bottom:5px; font-size:1rem;">⚠️ Masa Aktif Berakhir</b>
+                <p style="font-size: 0.85rem; color: #334155; margin: 0 0 10px 0; line-height: 1.4;">
+                    Waktu akses Anda telah habis. Perpanjang akses sistem selama <b>7 hari ke depan</b> dengan biaya <b>Rp 10.000</b>.
+                </p>
+                <a href="https://wa.me/6285706889273?text=Halo%20Admin,%20saya%20mau%20perpanjang%20akses%20web%20surat%20lamaran%20saya." target="_blank" class="btn-wa-renew">
+                    💬 Hubungi Admin via WA
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. POPUP LOGIN ADMIN -->
+    <div class="admin-overlay" id="overlayLoginAdmin">
+        <div class="admin-box" style="max-width: 320px;">
+            <h3>🔒 Otorisasi Admin</h3>
+            <p style="font-size: 0.9rem; color: #475569; margin-bottom:15px;">Masukkan Sandi Rahasia</p>
+            <input type="password" id="inputPassAdmin" placeholder="Ketik Sandi..." style="text-align: center;">
+            <button class="btn-admin" style="width:100%; margin-top:10px;" onclick="cekPasswordAdmin()">Masuk Panel</button>
+            <button class="btn-admin btn-danger" style="width:100%; margin-top:8px;" onclick="tutupSemuaAdmin()">Batal</button>
+        </div>
+    </div>
+
+    <!-- 2. DASHBOARD ADMIN UTAMA (DENGAN FORM BIODATA & ISI SURAT) -->
+    <div class="admin-overlay" id="overlayDashboardAdmin">
+        <div class="admin-box" style="max-width: 480px;">
+            <h3 style="border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom:10px;">⚙️ Admin Dashboard</h3>
+            
+            <div class="admin-section">
+                <b style="color: var(--primary);">➕ Tambah Klien & Setup Surat</b><br><br>
+                
+                <div class="admin-form-scroll">
+                    <label>Nama Lengkap (Wajib):</label>
+                    <input type="text" id="adminNamaKlien" placeholder="Contoh: Budi Santoso">
+                    
+                    <label>Pendidikan Terakhir:</label>
+                    <input type="text" id="adminPendidikan" placeholder="Contoh: SMK Negeri 1 Grati - Teknik...">
+                    
+                    <label>Status Nikah:</label>
+                    <input type="text" id="adminStatus" placeholder="Contoh: Belum Menikah">
+                    
+                    <label>Alamat Lengkap:</label>
+                    <textarea id="adminAlamat" placeholder="Contoh: Dsn. Krajan RT 01/RW 08..."></textarea>
+                    
+                    <label>No. Telp / WA:</label>
+                    <input type="text" id="adminTelp" placeholder="Contoh: 081234567890">
+                    
+                    <label>Paragraf 1 (Profil / Karakter):</label>
+                    <textarea id="adminProfil" placeholder="Contoh: Saya adalah individu yang disiplin... (Biarkan kosong untuk pakai teks default)"></textarea>
+                    
+                    <label>Paragraf 2 (Pengalaman Kerja):</label>
+                    <textarea id="adminPengalaman" placeholder="Contoh: Sebagai informasi, saya memiliki pengalaman... (Biarkan kosong untuk pakai teks default)"></textarea>
+                    
+                    <label>Daftar Lampiran (Enter untuk baris baru):</label>
+                    <textarea id="adminLampiranList" placeholder="1. Curriculum Vitae (CV)&#10;2. Fotokopi Ijazah&#10;3. Fotokopi KTP..."></textarea>
+                    
+                    <label>Paragraf Penutup:</label>
+                    <textarea id="adminPenutup" placeholder="Contoh: Besar harapan saya untuk dapat... (Biarkan kosong untuk teks default)"></textarea>
+                    
+                    <label style="margin-top:10px;">Upload Foto CV (Bisa Lebih Dari 1):</label>
+                    <input type="file" id="adminFileCv" accept="image/*" multiple style="background: white;">
+                </div>
+                
+                <button class="btn-admin" style="background-color: var(--secondary); width:100%; margin-top:8px;" onclick="prosesBuatKunciClient()" id="btnBuatKunci">
+                    🚀 Upload Data & Buat Kunci
+                </button>
+                
+                <div id="loadingBar">⏳ Menyimpan ke Database Server...</div>
+
+                <div class="hasil-key" id="boxHasilKey">
+                    Sukses! Aktivasi Key Klien:
+                    <button class="btn-copy" onclick="salinKey()">Salin</button>
+                    <span id="teksKunciBaru">JEF-XXXX</span>
                 </div>
             </div>
 
-            <!-- Tombol WA (Bisa Disembunyikan/Dimunculkan via JS) -->
-            <a href="https://wa.me/6285706889273?text=Halo%20Admin,%20saya%20mau%20meminta%20kunci%20akses%20Web%20Surat%20Lamaran." id="btnWaAdmin" class="btn-wa" target="_blank" style="margin-top:20px;">
-                Hubungi Admin (WhatsApp)
-            </a>
+            <div class="admin-section">
+                <b style="color: var(--primary);">📋 Kelola Status Klien</b>
+                <button onclick="loadDataKlien()" style="float:right; cursor:pointer; padding:3px 8px; font-size:0.75rem; border-radius:5px; border:1px solid #ccc;">🔄 Refresh</button>
+                <div class="client-list" id="daftarKlienHtml">
+                    <div style="padding:15px; text-align:center; color:#64748b;">Memuat database server...</div>
+                </div>
+            </div>
+
+            <button class="btn-admin btn-danger" style="width:100%;" onclick="tutupSemuaAdmin()">Tutup Admin Panel</button>
         </div>
     </div>
 
-    <!-- POPUP EDUKASI DOWNLOAD -->
-    <div id="tutorialModal">
-        <div class="modal-content">
-            <h3>Cara Penggabungan File (PDF)</h3>
-            <p>Surat lamaran ini akan diunduh dalam format <b>Gambar (PNG) HD</b>. Anda perlu menggabungkannya dengan file dokumen lain menjadi PDF secara mandiri.</p>
+    <!-- 3. MODAL EDIT KLIEN -->
+    <div class="admin-overlay" id="overlayEditKlien">
+        <div class="admin-box" style="max-width:400px;">
+            <h3 style="text-align: center;">✏️ Edit Data Klien</h3>
             
-            <div class="warning-box">
-                ⚠️ PERINGATAN KERAS!<br>
-                Saat menggabungkan file nanti, URUTAN DOKUMEN HARUS SESUAI dengan daftar lampiran:<br>
-                1. Surat Lamaran (Halaman 1)<br>
-                2. Curriculum Vitae (CV)<br>
-                3. Fotokopi Ijazah<br>
-                4. Fotokopi KTP<br>
-                5. Paklaring<br>
-                6. Fotokopi SKCK<br>
-                7. Dokumen Pendukung Lainnya
+            <div class="admin-form-scroll" style="text-align: left;">
+                <input type="hidden" id="editKeyVal">
+                
+                <label>Nama Lengkap:</label>
+                <input type="text" id="editNamaVal" style="text-align: left;">
+                
+                <label>Pendidikan:</label>
+                <input type="text" id="editPendidikanVal" style="text-align: left;">
+                
+                <label>Status Nikah:</label>
+                <input type="text" id="editStatusVal" style="text-align: left;">
+                
+                <label>Alamat Lengkap:</label>
+                <textarea id="editAlamatVal"></textarea>
+                
+                <label>No Telp:</label>
+                <input type="text" id="editTelpVal" style="text-align: left;">
+                
+                <label>Paragraf 1 (Profil):</label>
+                <textarea id="editProfilVal"></textarea>
+                
+                <label>Paragraf 2 (Pengalaman):</label>
+                <textarea id="editPengalamanVal"></textarea>
+                
+                <label>Daftar Lampiran (Beri Enter):</label>
+                <textarea id="editLampiranListVal"></textarea>
+                
+                <label>Paragraf Penutup:</label>
+                <textarea id="editPenutupVal"></textarea>
+
+                <label>Foto CV Lama (Hapus centang untuk menghapus):</label>
+                <div id="editCvList" style="background:rgba(255,255,255,0.7); padding:10px; border:1px solid #ccc; max-height:100px; overflow-y:auto; margin-bottom:10px; border-radius:8px;"></div>
+
+                <label>➕ Tambah Foto CV Baru (Opsional):</label>
+                <input type="file" id="editFileBaru" accept="image/*" multiple style="background: white;">
             </div>
 
-            <div class="app-list">
-                <b>Rekomendasi Alat Penggabung PDF (Gratis):</b>
-                <ul>
-                    <li><b>Lewat Website:</b> iLovePDF.com atau Smallpdf.com</li>
-                    <li><b>Lewat Aplikasi HP:</b> CamScanner, Image to PDF, atau WPS Office.</li>
-                </ul>
-            </div>
+            <div id="loadingEdit" style="display:none; color: #1e3a8a; background: #dbeafe; padding: 10px; border-radius: 8px; margin-top: 10px; font-weight: bold; font-size: 0.9rem; text-align:center;">⏳ Menyimpan data...</div>
 
-            <button class="btn-lanjut" id="btnProsesUnduh" onclick="eksekusiDownload()">Oke, Saya Paham & Unduh</button>
+            <button class="btn-admin" style="background-color: var(--secondary); width:100%; margin-top:10px;" onclick="simpanEditKlien()" id="btnSimpanEdit">💾 Simpan Perubahan</button>
+            <button class="btn-admin btn-danger" style="width:100%; margin-top:8px;" onclick="document.getElementById('overlayEditKlien').style.display='none'">Batal</button>
         </div>
     </div>
 
-    <!-- APLIKASI UTAMA (MUNCUL JIKA KUNCI BENAR & WAKTU BELUM HABIS) -->
+    <!-- ============================================== -->
+    <!-- APLIKASI UTAMA (FORM ISIAN KHUSUS HP) -->
+    <!-- ============================================== -->
     <div id="appUtama">
         <div class="navbar">
-            <div class="navbar-title">Surat Lamaran Generator PRO</div>
-            <!-- WAKTU HITUNG MUNDUR (Kecil di Bawah Judul) -->
-            <div class="navbar-timer" id="countdownTimer">Menghitung Sisa Waktu...</div>
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+                <div class="navbar-title">Surat Lamaran Generator Pro</div>
+                <div class="navbar-timer" id="countdownTimer">Sisa Waktu: Menghitung...</div>
+            </div>
+            <!-- GERIGI ADMIN DI NAVBAR -->
+            <div class="btn-admin-nav" onclick="bukaPopupLoginAdmin()" title="Admin Panel">⚙️</div>
         </div>
-
+        
         <div class="app-wrapper">
-            <!-- FORM PANEL -->
+            <!-- PANEL ISIAN TEPAT DI TENGAH -->
             <div class="form-panel">
-                <h3>Data Surat Lamaran</h3>
+                <h3 style="margin-top:0; color:var(--primary); font-weight:800;">Tujuan Surat Lamaran</h3>
+                
                 <div class="form-group">
                     <label>Tempat & Tanggal Surat</label>
                     <input type="text" id="inputKota" placeholder="Contoh: Pasuruan, 18 Juli 2026" onkeyup="updatePreview()">
@@ -191,41 +386,70 @@
                     <label>Nama Perusahaan Tujuan</label>
                     <input type="text" id="inputPT" placeholder="Contoh: PT Indofood CBP" onkeyup="updatePreview()">
                 </div>
-
-                <button class="btn-download" onclick="tampilkanPopup()">Unduh Gambar (PNG)</button>
-                <p class="info-text"><b>Sistem Web Pro:</b> Mencetak teks menjadi gambar resolusi tinggi tanpa membuat HP error. Penggabungan lampiran dilakukan mandiri.</p>
+                <div class="form-group">
+                    <label>Jumlah Lampiran</label>
+                    <input type="number" id="inputLampiran" inputmode="numeric" placeholder="Contoh: 7" onkeyup="updatePreview()" onchange="updatePreview()">
+                </div>
+                
+                <!-- HANYA TOMBOL KOREKSI DI HALAMAN UTAMA -->
+                <button class="btn-download btn-koreksi" onclick="bukaKoreksi()">🔍 Koreksi Surat Lamaran</button>
+                
+                <hr style="margin:25px 0 15px 0; border:0; border-top:2px dashed #cbd5e1;">
+                
+                <label style="color: var(--primary);">📦 Unduh File CV Anda:</label>
+                <div id="areaDownloadCvUtama" class="cv-link-list"></div>
+                
+                <div style="margin-top:20px; font-size:0.75rem; color:#b91c1c; background:#fee2e2; padding:10px; border-radius:8px;">
+                    <b>Peringatan Keamanan:</b> Sistem otomatis terkunci jika Anda keluar atau me-refresh halaman ini.
+                </div>
             </div>
+        </div>
+    </div>
 
-            <!-- PREVIEW PANEL -->
-            <div class="preview-panel">
-                <div class="a4-paper" id="hal-surat">
+    <!-- ============================================== -->
+    <!-- 4. MODAL KOREKSI SURAT (UKURAN BESAR & BISA ZOOM) -->
+    <!-- ============================================== -->
+    <div class="admin-overlay" id="popupKoreksi" style="z-index: 99999;">
+        <div class="admin-box" style="padding: 15px;">
+            <h3 style="margin-bottom: 2px;">Koreksi Surat</h3>
+            <p style="font-size: 0.75rem; color: #64748b; margin-bottom: 10px;">(Sentuh/Klik gambar kertas untuk Zoom in / Zoom out)</p>
+            
+            <!-- Area Scroll Kertas -->
+            <div id="kertasContainer">
+                <div id="kertasSpacer"></div>
+                <!-- KERTAS SURAT YANG DINAMIS -->
+                <div class="a4-paper" id="hal-surat" onclick="toggleZoomKertas()">
                     <div class="right-align highlight" id="preview-kota">Pasuruan, ............................</div>
-
                     <div class="mb-3">
-                        <p class="no-margin">Hal: Lamaran Pekerjaan – <span id="preview-posisi1" class="highlight">[Posisi yang Dilamar]</span></p>
-                        <p class="no-margin">Lampiran: 7 (Tujuh) Berkas</p>
+                        <p style="margin:0;">Hal: Lamaran Pekerjaan – <span id="preview-posisi1" class="highlight">[Posisi yang Dilamar]</span></p>
+                        <p style="margin:0;">Lampiran: <span id="preview-lampiran" class="highlight">7 (Tujuh) Berkas</span></p>
                     </div>
-
                     <div class="mb-3">
-                        <p class="no-margin"><b>Yth. Bapak/Ibu HRD <span id="preview-pt" class="highlight">[Nama Perusahaan]</span></b></p>
-                        <p class="no-margin"><b>Di Tempat</b></p>
+                        <p style="margin:0;"><b>Yth. Bapak/Ibu HRD <span id="preview-pt" class="highlight">[Nama Perusahaan]</span></b></p>
+                        <p style="margin:0;"><b>Di Tempat</b></p>
                     </div>
-
                     <p><b>Dengan hormat,</b></p>
-                    <p style="margin-bottom: 8px;">Berdasarkan informasi lowongan pekerjaan yang saya terima, melalui surat ini saya bermaksud melamar posisi <b><span id="preview-posisi2" class="highlight">[Posisi yang Dilamar]</span> di <span id="preview-pt2" class="highlight">[Nama Perusahaan]</span></b>. Berikut adalah data diri singkat saya:</p>
-
+                    <p>Berdasarkan informasi lowongan pekerjaan yang saya terima, melalui surat ini saya bermaksud melamar posisi <b><span id="preview-posisi2" class="highlight">[Posisi yang Dilamar]</span> di <span id="preview-pt2" class="highlight">[Nama Perusahaan]</span></b>. Berikut adalah data diri singkat saya:</p>
+                    
                     <table>
-                        <tr><td class="col-1">Nama</td><td class="col-2">:</td><td>Samsudin Rohmatul Jefri</td></tr>
-                        <tr><td class="col-1">Pendidikan</td><td class="col-2">:</td><td>SMK Negeri 1 Grati – Teknik Pengecoran Logam</td></tr>
-                        <tr><td class="col-1">Status Nikah</td><td class="col-2">:</td><td>Menikah</td></tr>
-                        <tr><td class="col-1">Alamat</td><td class="col-2">:</td><td>Dsn. Krajan RT 001/RW 008, Desa Plososari, Kec. Grati, Kab. Pasuruan, Jawa Timur</td></tr>
-                        <tr><td class="col-1">No. Telp</td><td class="col-2">:</td><td>0821 4342 2981</td></tr>
+                        <tr><td class="col-1">Nama</td><td class="col-2">:</td><td id="val-nama" style="font-weight:bold;">-</td></tr>
+                        <tr><td class="col-1">Pendidikan</td><td class="col-2">:</td><td id="val-pendidikan">-</td></tr>
+                        <tr><td class="col-1">Status Nikah</td><td class="col-2">:</td><td id="val-status">-</td></tr>
+                        <tr><td class="col-1">Alamat</td><td class="col-2">:</td><td id="val-alamat">-</td></tr>
+                        <tr><td class="col-1">No. Telp</td><td class="col-2">:</td><td id="val-telp">-</td></tr>
                     </table>
 
-                    <p>Saya adalah individu yang disiplin, cekatan, dan memiliki ketahanan fisik prima untuk bekerja dengan target harian di lingkungan pabrik. Saya menaruh minat besar pada proses manufaktur, serta memiliki pemahaman yang kuat terkait standar Keselamatan dan Kesehatan Kerja (K3) dan penerapan budaya 5R di area kerja.</p>
-                    <p>Sebagai informasi, saya memiliki pengalaman lebih dari 3 tahun di industri manufaktur (PT Yamaha Electronics Manufacturing Indonesia dan PT Syngenta Seed Indonesia). Pengalaman ini melatih saya untuk tangkas mengoperasikan mesin produksi skala besar (seperti mesin <i>Press, Glue Line</i>, dan <i>Conveyor</i>), serta cermat melakukan <i>Quality Control</i> (QC) presisi guna memastikan standar <i>zero defect</i>.</p>
-                    <p style="margin-bottom: 0;">Sebagai bahan pertimbangan Bapak/Ibu, saya turut melampirkan:</p>
-                    <ol>
+                    <div id="val-profil">
+                        <p>Saya adalah individu yang disiplin, cekatan, dan memiliki ketahanan fisik prima untuk bekerja dengan target harian di lingkungan pabrik. Saya menaruh minat besar pada proses manufaktur, serta memiliki pemahaman yang kuat terkait standar Keselamatan dan Kesehatan Kerja (K3) dan penerapan budaya 5R di area kerja.</p>
+                    </div>
+                    
+                    <div id="val-pengalaman">
+                        <p style="margin-bottom: 0;">Sebagai informasi, saya memiliki pengalaman lebih dari 3 tahun di industri manufaktur (PT Yamaha Electronics Manufacturing Indonesia dan PT Syngenta Seed Indonesia). Pengalaman ini melatih saya untuk tangkas mengoperasikan mesin produksi skala besar (seperti mesin <i>Press, Glue Line</i>, dan <i>Conveyor</i>), serta cermat melakukan <i>Quality Control</i> (QC) presisi guna memastikan standar <i>zero defect</i>.</p>
+                    </div>
+
+                    <p style="margin-top: 12px;">Sebagai bahan pertimbangan Bapak/Ibu, saya turut melampirkan:</p>
+                    
+                    <ol id="val-lampiran-list">
                         <li>Curriculum Vitae (CV)</li>
                         <li>Fotokopi Ijazah</li>
                         <li>Fotokopi KTP</li>
@@ -235,191 +459,449 @@
                         <li>Dokumen Pendukung Lainnya</li>
                     </ol>
 
-                    <p>Besar harapan saya untuk dapat mengikuti tahapan wawancara agar saya bisa menjelaskan lebih detail mengenai kualifikasi saya. Atas waktu dan perhatian Bapak/Ibu, saya ucapkan terima kasih.</p>
+                    <div id="val-penutup">
+                        <p>Besar harapan saya untuk dapat mengikuti tahapan wawancara agar saya bisa menjelaskan lebih detail mengenai kualifikasi saya. Atas waktu dan perhatian Bapak/Ibu, saya ucapkan terima kasih.</p>
+                    </div>
 
                     <div class="ttd">
-                        <p class="no-margin"><b>Hormat saya,</b></p>
-                        <p class="nama-ttd">Samsudin Rohmatul Jefri</p>
+                        <p style="margin:0;"><b>Hormat saya,</b></p>
+                        <p class="nama-ttd" id="val-nama-ttd">-</p>
                     </div>
                 </div>
             </div>
+            
+            <!-- TOMBOL DI DALAM POPUP KOREKSI -->
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn-download btn-danger" style="flex: 1; padding: 12px; margin-top:0; font-size:0.95rem; background:#ef4444;" onclick="document.getElementById('popupKoreksi').style.display='none'">Tutup</button>
+                <button class="btn-download" style="flex: 1.5; margin-top:0; padding: 12px; font-size:0.95rem;" onclick="tampilkanPopupUnduh()">⬇️ Unduh Surat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. POPUP EDUKASI PENGUNDUHAN -->
+    <div id="tutorialModal" class="admin-overlay" style="z-index: 100000;">
+        <div class="modal-content" style="background: rgba(255, 255, 255, 0.95); padding: 30px 20px; border-radius: 16px; max-width: 450px; text-align: center; color: #0f172a;">
+            <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 10px; font-weight: 800;">Panduan Penggabungan PDF</h3>
+            <p style="color: #1e293b; line-height: 1.5; font-size: 0.95rem;">Surat lamaran ini diunduh dalam format <b>Gambar (PNG) HD</b> berkualitas tinggi. Silakan gabungkan dengan dokumen Anda lainnya menjadi 1 file PDF secara mandiri.</p>
+            
+            <div style="background: #fef3c7; color: #b45309; padding: 15px; border-radius: 10px; border-left: 5px solid #fbbf24; margin: 15px 0; font-weight: bold; font-size: 0.9rem; text-align: left;">
+                ⚠️ PENTING: URUTAN FILE HARUS SESUAI!<br>
+                1. Surat Lamaran (Halaman 1)<br>
+                2. Curriculum Vitae (CV)<br>
+                3. Fotokopi Ijazah<br>
+                4. Fotokopi KTP<br>
+                5. Paklaring<br>
+                6. Fotokopi SKCK<br>
+                7. Dokumen Lainnya
+            </div>
+
+            <div style="background: rgba(0, 0, 0, 0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: left; font-size: 0.85rem;">
+                <b>Rekomendasi Alat (Gratis):</b>
+                <ul style="margin: 5px 0 0 0; padding-left: 20px; color: #334155;">
+                    <li><b>Website:</b> iLovePDF.com / Smallpdf.com</li>
+                    <li><b>Aplikasi HP:</b> CamScanner / WPS Office</li>
+                </ul>
+            </div>
+
+            <button class="btn-download" id="btnProsesUnduh" style="box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);" onclick="eksekusiDownload()">Oke, Saya Paham & Unduh</button>
         </div>
     </div>
 
     <script>
         // ==========================================
-        // SISTEM KEAMANAN (KUNCI & KIAMAT WEB)
+        // ANIMASI MATRIX HACKER (DIPERLAMBAT & HANYA DI AWAL)
         // ==========================================
-        
-        // Aturan Kunci Mutlak
-        const KUNCI_RAHASIA = "Jefri#SRT02973$20";
-        
-        // Aturan Batas Waktu Kiamat (Tgl 24 Juli 2026 Jam 12:00 Siang)
-        const BATAS_WAKTU_KIAMAT = new Date("2026-07-24T12:00:00").getTime();
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        function cekSistemUtama() {
-            let waktuSekarang = new Date().getTime();
-            let layarKunci = document.getElementById('lockScreen');
-            let layarUtama = document.getElementById('appUtama');
+        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%';
+        const alphabet = katakana + latin;
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let rainDrops = [];
+        for (let x = 0; x < columns; x++) { rainDrops[x] = 1; }
 
-            // 1. CEK APAKAH SUDAH KIAMAT (LEWAT TGL 24 JAM 12 SIANG)
-            if (waktuSekarang >= BATAS_WAKTU_KIAMAT) {
-                layarUtama.style.display = 'none';
-                layarKunci.style.display = 'flex';
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(5, 8, 17, 0.15)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ffff'; 
+            ctx.font = 'bold ' + fontSize + 'px monospace';
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) { rainDrops[i] = 0; }
+                rainDrops[i]++;
+            }
+        }
+        let matrixInterval = setInterval(drawMatrix, 75);
+
+        // ==========================================
+        // FITUR KOREKSI & ZOOM KERTAS
+        // ==========================================
+        function bukaKoreksi() {
+            document.getElementById('popupKoreksi').style.display = 'flex';
+            document.getElementById('kertasContainer').scrollTop = 0;
+        }
+
+        let isZoomed = false;
+        function toggleZoomKertas() {
+            const paper = document.getElementById('hal-surat');
+            const spacer = document.getElementById('kertasSpacer');
+            
+            if (!isZoomed) {
+                paper.classList.add('zoomed');
+                spacer.style.width = 'calc(210mm * 0.85)';
+                spacer.style.height = 'calc(297mm * 0.85)';
+                isZoomed = true;
+            } else {
+                paper.classList.remove('zoomed');
+                spacer.style.width = 'calc(210mm * 0.45)';
+                spacer.style.height = 'calc(297mm * 0.45)';
+                isZoomed = false;
+            }
+        }
+
+        function tampilkanPopupUnduh() {
+            document.getElementById('popupKoreksi').style.display = 'none'; 
+            document.getElementById('tutorialModal').style.display = 'flex';  
+        }
+
+        // ==========================================
+        // KONFIGURASI API & SANDI ADMIN
+        // ==========================================
+        const URL_API = "https://script.google.com/macros/s/AKfycbyCJe0pH6-rWG6gzX33kIfpe4T6F1pGZs4obd-rcIi_OLic60PPpyJLXmWgc3w2E3jr/exec"; 
+        const PASSWORD_MASTER = "2Udr7j$*1"; 
+        let globalDatabaseClients = []; 
+
+        // ==========================================
+        // 1. SISTEM ADMIN PANEL (DENGAN FORM BIODATA LENGKAP)
+        // ==========================================
+        function bukaPopupLoginAdmin() { document.getElementById('overlayLoginAdmin').style.display = 'flex'; }
+        function tutupSemuaAdmin() {
+            document.querySelectorAll('.admin-overlay').forEach(el => {
+                if (el.id !== 'popupKoreksi' && el.id !== 'tutorialModal') el.style.display = 'none';
+            });
+            document.getElementById('inputPassAdmin').value = '';
+        }
+        function cekPasswordAdmin() {
+            if (document.getElementById('inputPassAdmin').value === PASSWORD_MASTER) {
+                document.getElementById('overlayLoginAdmin').style.display = 'none';
+                document.getElementById('overlayDashboardAdmin').style.display = 'flex';
+                loadDataKlien();
+            } else { alert("Sandi Admin Salah!"); }
+        }
+
+        async function getBase64Files(inputElement) {
+            let files = inputElement.files;
+            let result = [];
+            for (let i = 0; i < files.length; i++) {
+                let base64 = await new Promise(resolve => {
+                    let reader = new FileReader();
+                    reader.onload = e => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(files[i]);
+                });
+                result.push({ name: files[i].name, mime: files[i].type, data: base64 });
+            }
+            return result;
+        }
+
+        async function prosesBuatKunciClient() {
+            let nama = document.getElementById('adminNamaKlien').value;
+            let fileInput = document.getElementById('adminFileCv');
+            let btn = document.getElementById('btnBuatKunci');
+            let loading = document.getElementById('loadingBar');
+            
+            if (!nama || fileInput.files.length === 0) return alert("Isi Nama Lengkap dan pilih minimal 1 foto CV!");
+            btn.disabled = true; loading.style.display = 'block'; document.getElementById('boxHasilKey').style.display = 'none';
+            
+            try {
+                let base64Files = await getBase64Files(fileInput);
+                let payload = { 
+                    action: "create", 
+                    namaKlien: nama, 
+                    pendidikan: document.getElementById('adminPendidikan').value,
+                    statusNikah: document.getElementById('adminStatus').value,
+                    alamat: document.getElementById('adminAlamat').value,
+                    noTelp: document.getElementById('adminTelp').value,
+                    profil: document.getElementById('adminProfil').value,
+                    pengalaman: document.getElementById('adminPengalaman').value,
+                    lampiranList: document.getElementById('adminLampiranList').value,
+                    penutup: document.getElementById('adminPenutup').value,
+                    files: base64Files 
+                };
                 
-                // Ubah Teks & Sembunyikan Kolom Kunci (Kunci tidak berlaku lagi)
-                document.getElementById('lockTitle').innerText = "Waktu Akses Berakhir";
-                document.getElementById('lockTitle').style.color = "var(--danger)";
-                document.getElementById('lockDesc').innerText = "Batas waktu penggunaan sistem (24 Juli Jam 12:00) telah habis. Web ini telah ditutup. Silakan hubungi Admin.";
-                document.getElementById('formAktivasi').style.display = 'none';
-                return; // Hentikan proses
-            }
-
-            // 2. JIKA BELUM KIAMAT, CEK APAKAH HP INI SUDAH MEMASUKKAN KUNCI
-            let statusAktif = localStorage.getItem('samsudin_active');
-            
-            if (statusAktif === 'yes') {
-                // Kunci sudah dimasukkan sebelumnya, langsung masuk ke web & jalankan timer
-                layarKunci.style.display = 'none';
-                layarUtama.style.display = 'flex';
-                jalankanTimerDiNavbar();
-            } else {
-                // Pertama kali buka, minta kunci
-                layarUtama.style.display = 'none';
-                layarKunci.style.display = 'flex';
-            }
+                let res = await fetch(URL_API, { method: "POST", body: JSON.stringify(payload) });
+                let data = await res.json();
+                
+                if (data.status === "success") {
+                    document.getElementById('teksKunciBaru').innerText = data.key;
+                    document.getElementById('boxHasilKey').style.display = 'block';
+                    
+                    ['adminNamaKlien','adminPendidikan','adminStatus','adminAlamat','adminTelp','adminProfil','adminPengalaman','adminLampiranList','adminPenutup'].forEach(id => document.getElementById(id).value = '');
+                    fileInput.value = '';
+                    loadDataKlien();
+                } else { alert("Gagal: " + data.message); }
+            } catch (err) { alert("Terjadi kesalahan jaringan."); }
+            btn.disabled = false; loading.style.display = 'none';
         }
 
-        // Fungsi saat tombol BUKA WEB diklik
-        function prosesAktivasi() {
-            let inputUser = document.getElementById('inputKode').value;
-            
-            if (inputUser === KUNCI_RAHASIA) {
-                // Simpan ingatan di HP klien bahwa dia sudah pegang kunci
-                localStorage.setItem('samsudin_active', 'yes');
-                alert("Kunci Diterima! Selamat menggunakan sistem.");
-                location.reload(); // Refresh untuk membuka web
-            } else {
-                alert("Kunci Akses Salah! Perhatikan huruf besar dan simbolnya.");
-            }
+        function salinKey() {
+            let key = document.getElementById('teksKunciBaru').innerText;
+            navigator.clipboard.writeText(key);
+            alert("Kunci berhasil disalin!");
         }
 
-        // Fungsi Hitung Mundur Kecil di Navbar
-        function jalankanTimerDiNavbar() {
-            const elemenTimer = document.getElementById("countdownTimer");
-            
-            const hitungMundur = setInterval(function() {
-                const sekarang = new Date().getTime();
-                const selisih = BATAS_WAKTU_KIAMAT - sekarang;
+        function loadDataKlien() {
+            let container = document.getElementById('daftarKlienHtml');
+            container.innerHTML = "<div style='padding:10px; text-align:center;'>Memuat database server...</div>";
+            fetch(URL_API + "?action=get_all").then(res => res.json()).then(data => {
+                if (data.data.length === 0) {
+                    container.innerHTML = "<div style='padding:10px; font-size:0.85rem; color:red; text-align:center;'>Belum ada klien tersimpan.</div>";
+                    return;
+                }
+                globalDatabaseClients = data.data; 
+                let html = "";
+                data.data.forEach(item => {
+                    let statusBtnClass = item.status === "ACTIVE" ? "btn-toggle-on" : "btn-toggle-off";
+                    let statusText = item.status === "ACTIVE" ? "Aktif" : "Nonaktif";
+                    html += `
+                    <div class="client-item">
+                        <div><b style="font-size:0.95rem;">${item.nama}</b><br><span style="color:#64748b;">Key: <b>${item.key}</b></span></div>
+                        <div class="action-btns">
+                            <button class="${statusBtnClass}" onclick="toggleStatus('${item.key}')">${statusText}</button>
+                            <button style="background:#0284c7; color:white;" onclick="renewKlien('${item.key}')">+7 Hari</button>
+                            <button class="btn-edit" onclick="bukaEditKlien('${item.key}')">Edit</button>
+                            <button class="btn-danger" onclick="hapusKlien('${item.key}')">Hapus</button>
+                        </div>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            });
+        }
 
-                if (selisih <= 0) {
-                    clearInterval(hitungMundur);
-                    location.reload(); // Paksa refresh agar sistem terkunci kiamat
-                } else {
-                    const hari = Math.floor(selisih / (1000 * 60 * 60 * 24));
-                    const jam = Math.floor((selisih % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const menit = Math.floor((selisih % (1000 * 60 * 60)) / (1000 * 60));
+        function toggleStatus(key) { fetch(URL_API, { method: "POST", body: JSON.stringify({ action: "toggle_status", key: key }) }).then(res => res.json()).then(data => { if(data.status === "success") loadDataKlien(); }); }
+        function renewKlien(key) { if(!confirm("Perpanjang masa aktif klien ini 7 hari ke depan?")) return; fetch(URL_API, { method: "POST", body: JSON.stringify({ action: "renew", key: key }) }).then(res => res.json()).then(data => { if(data.status === "success") { alert("Diperpanjang!"); loadDataKlien(); } }); }
+        function hapusKlien(key) { if(!confirm("Yakin hapus klien " + key + "?")) return; fetch(URL_API, { method: "POST", body: JSON.stringify({ action: "delete", key: key }) }).then(res => res.json()).then(data => { if(data.status === "success") loadDataKlien(); }); }
+
+        function bukaEditKlien(key) {
+            let client = globalDatabaseClients.find(c => c.key === key);
+            document.getElementById('overlayEditKlien').style.display = 'flex';
+            
+            document.getElementById('editKeyVal').value = client.key; 
+            document.getElementById('editNamaVal').value = client.nama; 
+            document.getElementById('editPendidikanVal').value = client.biodata.pendidikan || ""; 
+            document.getElementById('editStatusVal').value = client.biodata.statusNikah || ""; 
+            document.getElementById('editAlamatVal').value = client.biodata.alamat || ""; 
+            document.getElementById('editTelpVal').value = client.biodata.noTelp || ""; 
+            document.getElementById('editProfilVal').value = client.biodata.profil || ""; 
+            document.getElementById('editPengalamanVal').value = client.biodata.pengalaman || ""; 
+            document.getElementById('editLampiranListVal').value = client.biodata.lampiranList || ""; 
+            document.getElementById('editPenutupVal').value = client.biodata.penutup || ""; 
+            document.getElementById('editFileBaru').value = '';
+            
+            let cvListHTML = "";
+            if (client.cvUrls) {
+                let urls = client.cvUrls.split(",");
+                urls.forEach((u, i) => { cvListHTML += `<div><label style="font-weight:normal; font-size:0.8rem; display:inline;"><input type="checkbox" class="cb-keep-url" value="${u}" checked> Foto CV ke-${i+1}</label></div>`; });
+            } else { cvListHTML = "<i style='font-size:0.8rem'>Tidak ada foto CV</i>"; }
+            document.getElementById('editCvList').innerHTML = cvListHTML;
+        }
+
+        async function simpanEditKlien() {
+            let key = document.getElementById('editKeyVal').value; 
+            let btn = document.getElementById('btnSimpanEdit'); 
+            let loading = document.getElementById('loadingEdit');
+            
+            let keepUrls = []; 
+            document.querySelectorAll('.cb-keep-url:checked').forEach(cb => keepUrls.push(cb.value));
+            
+            btn.disabled = true; loading.style.display = 'block';
+            try {
+                let newFiles = await getBase64Files(document.getElementById('editFileBaru'));
+                let payload = { 
+                    action: "edit", 
+                    key: key, 
+                    newName: document.getElementById('editNamaVal').value, 
+                    pendidikan: document.getElementById('editPendidikanVal').value,
+                    statusNikah: document.getElementById('editStatusVal').value,
+                    alamat: document.getElementById('editAlamatVal').value,
+                    noTelp: document.getElementById('editTelpVal').value,
+                    profil: document.getElementById('editProfilVal').value,
+                    pengalaman: document.getElementById('editPengalamanVal').value,
+                    lampiranList: document.getElementById('editLampiranListVal').value,
+                    penutup: document.getElementById('editPenutupVal').value,
+                    keepUrls: keepUrls, 
+                    newFiles: newFiles 
+                };
+                let res = await fetch(URL_API, { method: "POST", body: JSON.stringify(payload) });
+                let data = await res.json();
+                if (data.status === "success") { alert("Tersimpan!"); document.getElementById('overlayEditKlien').style.display = 'none'; loadDataKlien(); }
+            } catch(e) { alert("Terjadi kesalahan."); }
+            btn.disabled = false; loading.style.display = 'none';
+        }
+
+        // ==========================================
+        // 2. SISTEM KLIEN LOGIN, INJEKSI ISI SURAT & TIMER
+        // ==========================================
+        let BATAS_WAKTU_KIAMAT = 0;
+        let timerInterval;
+
+        function prosesAktivasiKlien() {
+            let key = document.getElementById('inputKode').value.trim();
+            let btn = document.querySelector('.kode-input button');
+            let notifExpired = document.getElementById('expiredNotification');
+            
+            if (!key) return alert("Silakan masukkan kunci!");
+
+            btn.innerText = "Mengecek Server...";
+            notifExpired.style.display = 'none'; 
+
+            fetch(URL_API + "?action=login&key=" + key)
+            .then(res => res.json())
+            .then(data => {
+                btn.innerText = "Buka Akses Sistem";
+                
+                if (data.status === "success") {
+                    BATAS_WAKTU_KIAMAT = parseInt(data.expiry);
                     
-                    // Format tulisan kecil di bawah judul
-                    elemenTimer.innerHTML = `Sisa Akses: ${hari} Hari, ${jam} Jam, ${menit} Menit`;
+                    document.getElementById('lockScreen').style.display = 'none';
+                    clearInterval(matrixInterval);
+                    document.getElementById('appUtama').style.display = 'flex';
                     
-                    if (hari < 1) {
-                        elemenTimer.style.color = "#fca5a5"; // Berubah merah muda jika sisa waktu kritis
+                    let areaTombol = document.getElementById('areaDownloadCvUtama');
+                    areaTombol.innerHTML = "";
+                    if(data.cvUrls) {
+                        let urls = data.cvUrls.split(",");
+                        urls.forEach((u, i) => {
+                            areaTombol.innerHTML += `<a href="${u}" target="_blank" class="btn-download" style="background: linear-gradient(135deg, #3b82f6, #2563eb); padding:12px; font-size:0.95rem; margin-top:10px;">📥 Unduh File CV ${i+1}</a>`;
+                        });
                     }
+                    
+                    document.getElementById('val-nama').innerText = data.nama;
+                    document.getElementById('val-nama-ttd').innerText = data.nama;
+                    document.getElementById('val-pendidikan').innerText = data.biodata.pendidikan || "SMK Negeri 1 Grati – Teknik Pengecoran Logam";
+                    document.getElementById('val-status').innerText = data.biodata.statusNikah || "Menikah";
+                    document.getElementById('val-alamat').innerText = data.biodata.alamat || "Dsn. Krajan RT 001/RW 008, Desa Plososari, Kec. Grati, Kab. Pasuruan, Jawa Timur";
+                    document.getElementById('val-telp').innerText = data.biodata.noTelp || "0821 4342 2981";
+                    
+                    if(data.biodata.profil && data.biodata.profil.trim() !== "") {
+                        document.getElementById('val-profil').innerHTML = `<p>${data.biodata.profil.replace(/\n/g, '<br>')}</p>`;
+                    }
+                    if(data.biodata.pengalaman && data.biodata.pengalaman.trim() !== "") {
+                        document.getElementById('val-pengalaman').innerHTML = `<p style="margin-bottom: 0;">${data.biodata.pengalaman.replace(/\n/g, '<br>')}</p>`;
+                    }
+                    if(data.biodata.penutup && data.biodata.penutup.trim() !== "") {
+                        document.getElementById('val-penutup').innerHTML = `<p>${data.biodata.penutup.replace(/\n/g, '<br>')}</p>`;
+                    }
+
+                    if(data.biodata.lampiranList && data.biodata.lampiranList.trim() !== "") {
+                        let lampiranHtml = "";
+                        let items = data.biodata.lampiranList.split('\n');
+                        items.forEach(item => {
+                            if(item.trim() !== "") lampiranHtml += `<li>${item.trim()}</li>`;
+                        });
+                        document.getElementById('val-lampiran-list').innerHTML = lampiranHtml;
+                    }
+                    
+                    jalankanTimer();
+                    initTeksDefault();
+                    
+                } else if (data.status === "expired" || data.status === "inactive") {
+                    notifExpired.style.display = 'block';
+                } else {
+                    alert("Kunci Salah atau Tidak Terdaftar di Server!");
+                }
+            }).catch(err => { alert("Gagal koneksi ke server. Cek internet Anda."); btn.innerText = "Buka Akses Sistem"; });
+        }
+
+        function jalankanTimer() {
+            const elemenTimer = document.getElementById("countdownTimer");
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                let sisa = BATAS_WAKTU_KIAMAT - new Date().getTime();
+                if (sisa <= 0) {
+                    document.getElementById('appUtama').style.display = 'none';
+                    document.getElementById('lockScreen').style.display = 'flex';
+                    document.getElementById('expiredNotification').style.display = 'block';
+                    // Mulai lagi animasi matriks karena user balik ke beranda
+                    matrixInterval = setInterval(drawMatrix, 75);
+                    clearInterval(timerInterval);
+                } else {
+                    let hari = Math.floor(sisa / (1000 * 60 * 60 * 24));
+                    let jam = Math.floor((sisa % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    let menit = Math.floor((sisa % (1000 * 60 * 60)) / (1000 * 60));
+                    let detik = Math.floor((sisa % (1000 * 60)) / 1000);
+                    
+                    elemenTimer.innerHTML = `Sisa Waktu: ${hari} Hari, ${jam} Jam, ${menit} Menit, ${detik} Detik`;
                 }
             }, 1000);
         }
 
-        // Panggil sistem pengecekan mutlak saat web dimuat
-        cekSistemUtama();
-
-        // ==========================================
-        // SISTEM PREVIEW TEKS SURAT
-        // ==========================================
-        window.onload = function() {
-            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-            const today = new Date();
-            const dateString = "Pasuruan, " + today.getDate() + " " + months[today.getMonth()] + " " + today.getFullYear();
-            
-            document.getElementById('inputKota').value = dateString;
+        function initTeksDefault() {
+            document.getElementById('inputKota').value = "";
+            document.getElementById('inputLampiran').value = "";
             updatePreview();
-        };
-
-        function updatePreview() {
-            let kota = document.getElementById('inputKota').value;
-            let posisi = document.getElementById('inputPosisi').value;
-            let pt = document.getElementById('inputPT').value;
-            
-            const prevKota = document.getElementById('preview-kota');
-            const prevPosisi1 = document.getElementById('preview-posisi1');
-            const prevPosisi2 = document.getElementById('preview-posisi2');
-            const prevPT = document.getElementById('preview-pt');
-            const prevPT2 = document.getElementById('preview-pt2');
-
-            prevKota.innerText = kota ? kota : "Pasuruan, ............................";
-            prevPosisi1.innerText = posisi ? posisi : "[Posisi yang Dilamar]";
-            prevPosisi2.innerText = posisi ? posisi : "[Posisi yang Dilamar]";
-            prevPT.innerText = pt ? pt : "[Nama Perusahaan]";
-            prevPT2.innerText = pt ? pt : "[Nama Perusahaan]";
-
-            prevKota.style.backgroundColor = kota ? "transparent" : "#ffffcc";
-            prevPosisi1.style.backgroundColor = posisi ? "transparent" : "#ffffcc";
-            prevPosisi2.style.backgroundColor = posisi ? "transparent" : "#ffffcc";
-            prevPT.style.backgroundColor = pt ? "transparent" : "#ffffcc";
-            prevPT2.style.backgroundColor = pt ? "transparent" : "#ffffcc";
         }
 
-        // ==========================================
-        // SISTEM POPUP & DOWNLOAD PNG
-        // ==========================================
-        function tampilkanPopup() {
-            document.getElementById('tutorialModal').style.display = 'flex';
+        function updatePreview() {
+            let k = document.getElementById('inputKota').value;
+            let p = document.getElementById('inputPosisi').value;
+            let pt = document.getElementById('inputPT').value;
+            let lamp = document.getElementById('inputLampiran').value;
+            
+            const m = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const t = new Date();
+            let defaultDate = "Pasuruan, " + t.getDate() + " " + m[t.getMonth()] + " " + t.getFullYear();
+
+            document.getElementById('preview-kota').innerText = k || defaultDate;
+            document.getElementById('preview-posisi1').innerText = p || "[Posisi yang Dilamar]";
+            document.getElementById('preview-posisi2').innerText = p || "[Posisi yang Dilamar]";
+            document.getElementById('preview-pt').innerText = pt || "[Nama Perusahaan]";
+            document.getElementById('preview-pt2').innerText = pt || "[Nama Perusahaan]";
+            
+            if (lamp) {
+                document.getElementById('preview-lampiran').innerText = lamp + " Berkas";
+            } else {
+                document.getElementById('preview-lampiran').innerText = "7 (Tujuh) Berkas";
+            }
         }
 
         async function eksekusiDownload() {
-            document.getElementById('tutorialModal').style.display = 'none';
+            document.getElementById('tutorialModal').style.display = 'none'; 
             
-            const btn = document.getElementById('btnProsesUnduh');
-            const mainBtn = document.querySelector('.btn-download');
-            const surat = document.getElementById('hal-surat');
-
+            const s = document.getElementById('hal-surat');
+            const mainBtn = document.getElementById('btnProsesUnduh'); 
+            
             document.querySelectorAll('.highlight').forEach(el => el.style.backgroundColor = 'transparent');
-            mainBtn.innerText = "Memproses Gambar...";
-
-            const clone = surat.cloneNode(true);
-            clone.style.transform = 'none';
-            clone.style.position = 'fixed';
-            clone.style.top = '0';
-            clone.style.left = '0';
+            let originalText = mainBtn.innerText;
+            mainBtn.innerText = "Memproses...";
+            
+            const clone = s.cloneNode(true);
+            clone.style.transform = 'none'; 
+            clone.style.position = 'fixed'; 
+            clone.style.top = '0'; 
+            clone.style.left = '0'; 
             clone.style.zIndex = '-9999';
+            clone.classList.remove('zoomed'); 
             document.body.appendChild(clone);
 
             setTimeout(async () => {
                 try {
-                    const canvas = await html2canvas(clone, {
-                        scale: 3, 
-                        useCORS: true,
-                        backgroundColor: '#ffffff'
-                    });
-
-                    const imgData = canvas.toDataURL('image/png');
-
-                    let ptName = document.getElementById('inputPT').value || 'Perusahaan';
-                    let posName = document.getElementById('inputPosisi').value || 'Posisi';
-                    let fileName = 'Surat_Lamaran_' + posName.replace(/ /g, '_') + '_' + ptName.replace(/ /g, '_') + '.png';
-
+                    const canvas = await html2canvas(clone, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
                     const link = document.createElement('a');
-                    link.href = imgData;
-                    link.download = fileName;
-                    document.body.appendChild(link);
-                    link.click();
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = 'Surat_Lamaran_' + (document.getElementById('inputPosisi').value || 'Posisi') + '.png';
+                    document.body.appendChild(link); 
+                    link.click(); 
                     document.body.removeChild(link);
-
-                } catch (error) {
-                    alert("Gagal mengunduh gambar. Pastikan browser Anda mendukung fitur ini.");
-                } finally {
-                    document.body.removeChild(clone);
-                    mainBtn.innerText = "Unduh Gambar (PNG)";
+                } catch (e) { alert("Gagal mengunduh surat."); }
+                finally { 
+                    document.body.removeChild(clone); 
+                    mainBtn.innerText = originalText; 
                     updatePreview(); 
                 }
             }, 100);
@@ -427,3 +909,4 @@
     </script>
 </body>
 </html>
+
